@@ -431,45 +431,54 @@ print(string.format("Anti Chat-Logger has loaded in %s seconds.", tostring(tick(
 Page.Button({
     Text = "antiCrash",
     Callback = function()
-    function AntiCrash()
+   --// Anti Crash Script \\--
+function AntiCrash()
+    local RunService = game:GetService("RunService")
+    local user = game:GetService("Players").LocalPlayer
+
     function Part1()
-        game:GetService("RunService").RenderStepped:Connect(function() 
-            for _, b in pairs(user.Backpack:GetChildren()) do 
-                if b.Name == "-" then 
-                    game.StarterGui:SetCore('SendNotification', {Title='AntiCrash'; Text='Hey '..name..'! Someone tried to crash you!'}) 
+        RunService.RenderStepped:Connect(function() 
+            for _, item in ipairs(user.Backpack:GetChildren()) do
+                if item.Name == "-" then 
+                    item:Destroy() 
                 end 
             end
         end)
     end
+
     function nou()
-        local aa = Instance.new("Model", workspace)
-        aa.Name = name
-        Instance.new("Humanoid", aa)
-        local b = Instance.new("Part", aa)
-        b.Name = "Torso"
-        b.CanCollide = false
-        b.Transparency = 1
-        user.Character = aa
+        local newModel = Instance.new("Model", workspace)
+        newModel.Name = user.Name
+
+        local humanoid = Instance.new("Humanoid", newModel)
+        local torso = Instance.new("Part", newModel)
+        torso.Name = "Torso"
+        torso.CanCollide = false
+        torso.Transparency = 1
+
+        user.Character = newModel
     end
+
     function aaa()
-        game:GetService("RunService").RenderStepped:Connect(function() 
-            for _, b in pairs(user.Backpack:GetChildren()) do 
-                if b.Name == "-" then 
-                    nou() 
+        RunService.RenderStepped:Connect(function() 
+            for _, item in ipairs(user.Backpack:GetChildren()) do
+                if item.Name == "-" then 
+                    nou()
                 end 
             end
         end)
     end
-    game:GetService("RunService").RenderStepped:Connect(function() 
-        for _, b in pairs(user.Backpack:GetChildren()) do 
-            if b.Name == "-" then 
+
+    RunService.RenderStepped:Connect(function() 
+        for _, item in ipairs(user.Backpack:GetChildren()) do
+            if item.Name == "-" then 
                 user.Backpack:ClearAllChildren() 
             end 
         end
     end)
+
     Part1()
     aaa()
-    game.StarterGui:SetCore('SendNotification', {Title='AntiCrash'; Text='Hey '..name..'! AntiCrash ran successfully'})
 end
 
     end,
