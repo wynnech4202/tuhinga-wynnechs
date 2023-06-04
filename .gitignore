@@ -586,3 +586,15 @@ while wait(3)do
 end
     end,
 })
+
+Page.Button({
+    Text = "hang glider disabler",
+    Callback = function()
+ 
+while wait()do
+local ohTable1 = {}
+
+game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.out._NetManaged.HangGliderUse:FireServer(ohTable1)
+end
+    end,
+})
