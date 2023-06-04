@@ -479,7 +479,7 @@ end
 Page.Button({
     Text = "anti lag",
     Callback = function()
-       -- Anti-Lag Script for Roblox
+-- Anti-Lag Script for Roblox
 
 -- Define the delay time for anti-lag
 local delayTime = 0.1
@@ -487,12 +487,12 @@ local delayTime = 0.1
 -- Store the current time
 local currentTime = tick()
 
--- Store the list of objects that need to be deactivated
-local objectsToDeactivate = {}
+-- Get workspace descendants only once for optimization
+local workspaceDescendants = workspace:GetDescendants()
 
 -- Disable parts not in use
 local function disableParts()
-    for _, part in ipairs(workspace:GetDescendants()) do
+    for _, part in ipairs(workspaceDescendants) do
         if part:IsA("BasePart") and not part:IsA("Terrain") and not part.Anchored then
             part.CanCollide = false
         end
@@ -501,7 +501,7 @@ end
 
 -- Limit particle effects
 local function limitParticleEffects()
-    for _, emitter in ipairs(workspace:GetDescendants()) do
+    for _, emitter in ipairs(workspaceDescendants) do
         if emitter:IsA("ParticleEmitter") then
             emitter.Rate = math.min(emitter.Rate, 50)
             emitter.Lifetime = NumberRange.new(math.min(emitter.Lifetime.Min, 2), math.min(emitter.Lifetime.Max, 5))
@@ -511,10 +511,21 @@ end
 
 -- Optimize sounds
 local function optimizeSounds()
-    for _, sound in ipairs(workspace:GetDescendants()) do
+    for _, sound in ipairs(workspaceDescendants) do
         if sound:IsA("Sound") then
             sound.MaxDistance = math.min(sound.MaxDistance, 100)
         end
+    end
+end
+
+-- Toggle certain objects when player dies
+local function onPlayerDeath(objectsToToggle)
+    for _, obj in pairs(objectsToToggle) do
+        obj.Enabled = false
+    end
+    wait(delayTime)
+    for _, obj in pairs(objectsToToggle) do
+        obj.Enabled = true
     end
 end
 
@@ -522,13 +533,7 @@ end
 game.Players.PlayerAdded:Connect(function(player)
     player.CharacterAdded:Connect(function(character)
         character.Humanoid.Died:Connect(function()
-            for _, obj in pairs(objectsToDeactivate) do
-                obj.Enabled = false
-            end
-            wait(delayTime)
-            for _, obj in pairs(objectsToDeactivate) do
-                obj.Enabled = true
-            end
+            onPlayerDeath(workspaceDescendants)
         end)
     end)
 end)
@@ -539,6 +544,7 @@ limitParticleEffects()
 optimizeSounds()
 
 print("Anti-Lag Script has been executed.")
+
 
     end,
 })
