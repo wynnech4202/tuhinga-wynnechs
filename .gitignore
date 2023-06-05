@@ -16,7 +16,7 @@ local Page = UI.New({
 Page.Button({
     Text = "test (this dose nothing)",
     Callback = function()
-       workspace.username:WaitForChild("health"):Destroy()
+       
     end,
 })
 
@@ -685,4 +685,20 @@ while wait(1) do
 end
 
  end,
+})
+
+Page.Button({
+    Text = "vape",
+    Callback = function()
+       loadstring(game:HttpGet("https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/main/NewMainScript.lua", true))()
+
+    end,
+})
+
+Page.Button({
+    Text = "inf yeild",
+    Callback = function()
+    loadstring(game:HttpGet(('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'),true))()
+
+     end,
 })
