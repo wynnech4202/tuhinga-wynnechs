@@ -614,3 +614,52 @@ game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.ou
 end
     end,
 })
+
+Page.Button({
+    Text = "flying lucky block notification",
+    Callback = function()
+    local Workspace = game:GetService("Workspace")
+
+-- Function to send a message to all players
+local function sendMessageToAllPlayers(message)
+    local Players = game:GetService("Players")
+
+    for i, player in pairs(Players:GetPlayers()) do
+        local playerGui = player:FindFirstChild("PlayerGui")
+        if playerGui then
+            local ScreenGui = Instance.new("ScreenGui")
+            local TextLabel = Instance.new("TextLabel")
+
+            TextLabel.Size = UDim2.new(0, 200, 0, 50)
+            TextLabel.Position = UDim2.new(1, -210, 1, -60) -- Position changed to bottom right
+            TextLabel.BackgroundTransparency = 0.5
+            TextLabel.BackgroundColor3 = Color3.new(0, 0, 0)
+            TextLabel.TextColor3 = Color3.new(1, 1, 1)
+            TextLabel.Text = message
+            TextLabel.Parent = ScreenGui
+
+            ScreenGui.Parent = playerGui
+
+            wait(5)
+            ScreenGui:Destroy()
+        end
+    end
+end
+
+-- Function to check if the flying_lucky_block with its Root has spawned
+local function checkFlyingLuckyBlock()
+    if Workspace:FindFirstChild("flying_lucky_block") then
+        local flying_lucky_block = Workspace.flying_lucky_block
+        if flying_lucky_block:FindFirstChild("Root") then
+            sendMessageToAllPlayers("A flying Lucky Block has spawned!")
+        end
+    end
+end
+
+-- Run the checkFlyingLuckyBlock function every second
+while wait(1) do
+    checkFlyingLuckyBlock()
+end
+
+ end,
+})
