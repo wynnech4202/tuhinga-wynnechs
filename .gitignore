@@ -702,3 +702,13 @@ Page.Button({
 
      end,
 })
+
+Page.Button({
+    Text = "inf fly (requires flying backpack)",
+    Callback = function()
+    
+while wait(3) do
+game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.out._NetManaged.FlyingBackpackFlap:InvokeServer()
+end
+    end,
+})
