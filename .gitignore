@@ -5,7 +5,7 @@ local UI = Material.Load({
      Title = "wynnech (beta) private   ",
      Style = 5,
      SizeX = 300,
-     SizeY = 400,
+     SizeY = 500,
      Theme = "Dark"
 })
 
