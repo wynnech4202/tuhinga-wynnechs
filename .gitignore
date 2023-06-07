@@ -717,8 +717,8 @@ end
 Page.Button({
     Text = "inf fly tracking",
     Callback = function()
-   local thresholdHeight = 500  -- Define your height limit here
-local partSize = Vector3.new(1, 500, 1)  -- Define the size of the part
+local thresholdHeight = 500  -- Define your height limit here
+local partSize = Vector3.new(1, 1000, 1)  -- Define the size of the part
 local parts = {}  -- Table to store player parts
 local isTracking = {} -- Table to store tracking flags for each player
 
@@ -758,7 +758,9 @@ while true do
                     if not isTracking[player.UserId] then
                         local part = Instance.new("Part")
                         part.Anchored = true
-                        part.BrickColor = BrickColor.Blue()
+                        part.BrickColor = BrickColor.new("Royal purple")  -- Changed to Royal Purple
+                        part.Material = "Neon"  -- Added Neon material
+                        part.CanCollide = false  -- Set collision off
                         part.Size = partSize
                         part.Parent = workspace
                         parts[player.UserId] = part
@@ -766,7 +768,7 @@ while true do
 
                         sendMessageToAllPlayers(player.Name .. " is using inf fly")
                     end
-                    -- Update part position to follow player
+                    -- Update part position to follow player without delay
                     parts[player.UserId].Position = Vector3.new(humanoidRootPart.Position.X, 0, humanoidRootPart.Position.Z)
                 elseif isTracking[player.UserId] then
                     -- If player's height is under the limit and we're currently tracking them, stop tracking and remove their part
@@ -777,8 +779,9 @@ while true do
             end
         end
     end
-    wait(1)
+    wait(0.1) -- Reduced delay to make tracking faster
 end
+
 
 end,
 })
