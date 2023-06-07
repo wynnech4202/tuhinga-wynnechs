@@ -563,7 +563,7 @@ Page.Button({
     Callback = function()
        local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local proximity = 30 -- Set your preferred proximity range here
+local proximity = 18 -- Set your preferred proximity range here
 
 while wait() do
     local myPlayer = Players.LocalPlayer
