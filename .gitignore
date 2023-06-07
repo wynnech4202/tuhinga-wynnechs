@@ -712,3 +712,73 @@ game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.ou
 end
     end,
 })
+
+
+Page.Button({
+    Text = "inf fly detecter and shower",
+    Callback = function()
+   local thresholdHeight = 500  -- Define your height limit here
+local partSize = Vector3.new(1, 200, 1)  -- Define the size of the part
+local parts = {}  -- Table to store player parts
+local isTracking = {} -- Table to store tracking flags for each player
+
+local function sendMessageToAllPlayers(message)
+    local Players = game:GetService("Players")
+
+    for i, player in pairs(Players:GetPlayers()) do
+        local playerGui = player:FindFirstChild("PlayerGui")
+        if playerGui then
+            local ScreenGui = Instance.new("ScreenGui")
+            local TextLabel = Instance.new("TextLabel")
+
+            TextLabel.Size = UDim2.new(0, 200, 0, 50)
+            TextLabel.Position = UDim2.new(1, -210, 1, -120) -- Position changed to bottom right
+            TextLabel.BackgroundTransparency = 0.5
+            TextLabel.BackgroundColor3 = Color3.new(0, 0, 0)
+            TextLabel.TextColor3 = Color3.new(1, 1, 1)
+            TextLabel.Text = message
+            TextLabel.Parent = ScreenGui
+
+            ScreenGui.Parent = playerGui
+
+            wait(5)
+            ScreenGui:Destroy()
+        end
+    end
+end
+
+while true do
+    for i, player in pairs(game.Players:GetPlayers()) do
+        local character = player.Character
+        if character and character:IsDescendantOf(workspace) then
+            local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+            if humanoidRootPart then
+                if humanoidRootPart.Position.Y > thresholdHeight then
+                    -- If we're not currently tracking this player, start tracking them and send a message
+                    if not isTracking[player.UserId] then
+                        local part = Instance.new("Part")
+                        part.Anchored = true
+                        part.BrickColor = BrickColor.Blue()
+                        part.Size = partSize
+                        part.Parent = workspace
+                        parts[player.UserId] = part
+                        isTracking[player.UserId] = true
+
+                        sendMessageToAllPlayers(player.Name .. " is using inf fly")
+                    end
+                    -- Update part position to follow player
+                    parts[player.UserId].Position = Vector3.new(humanoidRootPart.Position.X, 0, humanoidRootPart.Position.Z)
+                elseif isTracking[player.UserId] then
+                    -- If player's height is under the limit and we're currently tracking them, stop tracking and remove their part
+                    parts[player.UserId]:Remove()
+                    parts[player.UserId] = nil
+                    isTracking[player.UserId] = false
+                end
+            end
+        end
+    end
+    wait(1)
+end
+
+end,
+})
