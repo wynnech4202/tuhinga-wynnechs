@@ -766,7 +766,7 @@ while true do
                         parts[player.UserId] = part
                         isTracking[player.UserId] = true
 
-                        sendMessageToAllPlayers(player.Name .. " is using inf fly")
+                        sendMessageToAllPlayers(player.Name .. " might be using inf fly")
                     end
                     -- Update part position to follow player without delay
                     parts[player.UserId].Position = Vector3.new(humanoidRootPart.Position.X, 0, humanoidRootPart.Position.Z)
