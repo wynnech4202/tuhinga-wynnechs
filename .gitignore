@@ -717,8 +717,8 @@ end
 Page.Button({
     Text = "inf fly tracking",
     Callback = function()
-local thresholdHeight = 500  -- Define your height limit here
-local partSize = Vector3.new(1, 1000, 1)  -- Define the size of the part
+local thresholdHeight = 1000  -- Define your height limit here
+local partSize = Vector3.new(1, 2000, 1)  -- Define the size of the part
 local parts = {}  -- Table to store player parts
 local isTracking = {} -- Table to store tracking flags for each player
 
