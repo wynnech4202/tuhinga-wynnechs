@@ -789,16 +789,28 @@ end,
 Page.Button({
     Text = "flying lucky block tp V key bind",
     Callback = function()
-       local UserInputService = game:GetService("UserInputService")
+     local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
 local StarterPlayer = game:GetService("StarterPlayer")
 local RunService = game:GetService("RunService")
 local teleporting = false
+local teleportConnection
 
 local function teleport(player, destination)
     local char = player.Character
-    if char then
-        char:MoveTo(destination)
+    if char and char.PrimaryPart then
+        local currentPos = char.PrimaryPart.Position
+        local journeyTime = 1 -- Change this value to make teleporting faster or slower
+        local startTime = tick()
+        teleportConnection = RunService.RenderStepped:Connect(function()
+            local t = (tick() - startTime) / journeyTime
+            if t <= 1 then
+                char:SetPrimaryPartCFrame(CFrame.new(currentPos:Lerp(destination, t)))
+            else
+                teleportConnection:Disconnect() -- Stops the teleportation when reached the destination
+                teleportConnection = nil
+            end
+        end)
     end
 end
 
@@ -809,6 +821,10 @@ end
 
 UserInputService.InputBegan:Connect(function(input)
     if input.KeyCode == Enum.KeyCode.V then
+        if teleportConnection then
+            teleportConnection:Disconnect()
+            teleportConnection = nil
+        end
         teleporting = not teleporting
         if teleporting then
             print("Teleporting started")
@@ -821,14 +837,18 @@ UserInputService.InputBegan:Connect(function(input)
 end)
 
 RunService.Heartbeat:Connect(function()
-    if teleporting then
+    if teleporting and not teleportConnection then
         local destination = Workspace:FindFirstChild("flying_lucky_block")
         if destination and destination:FindFirstChild("Root") then
             teleport(game.Players.LocalPlayer, destination.Root.Position)
             aimAtBlock(destination.Root.Position)
+        else
+            teleporting = false
+            print("No more flying lucky blocks found")
         end
     end
 end)
+ 
 
     end,
 })
