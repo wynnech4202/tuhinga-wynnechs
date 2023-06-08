@@ -4,7 +4,7 @@ local username = game.Players.LocalPlayer.Name
 local UI = Material.Load({
      Title = "wynnech (beta) private   ",
      Style = 5,
-     SizeX = 300,
+     SizeX = 400,
      SizeY = 600,
      Theme = "Dark"
 })
@@ -784,4 +784,51 @@ end
 
 
 end,
+})
+
+Page.Button({
+    Text = "flying lucky block tp V key bind",
+    Callback = function()
+       local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
+local StarterPlayer = game:GetService("StarterPlayer")
+local RunService = game:GetService("RunService")
+local teleporting = false
+
+local function teleport(player, destination)
+    local char = player.Character
+    if char then
+        char:MoveTo(destination)
+    end
+end
+
+local function aimAtBlock(destination)
+    local Camera = Workspace.CurrentCamera
+    Camera.CFrame = CFrame.new(Camera.CFrame.Position, destination)
+end
+
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.V then
+        teleporting = not teleporting
+        if teleporting then
+            print("Teleporting started")
+            StarterPlayer.CameraMode = Enum.CameraMode.LockFirstPerson
+        else
+            StarterPlayer.CameraMode = Enum.CameraMode.Classic
+            print("Teleporting stopped")
+        end
+    end
+end)
+
+RunService.Heartbeat:Connect(function()
+    if teleporting then
+        local destination = Workspace:FindFirstChild("flying_lucky_block")
+        if destination and destination:FindFirstChild("Root") then
+            teleport(game.Players.LocalPlayer, destination.Root.Position)
+            aimAtBlock(destination.Root.Position)
+        end
+    end
+end)
+
+    end,
 })
