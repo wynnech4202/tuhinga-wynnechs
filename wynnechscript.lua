@@ -446,7 +446,7 @@ local function teleport(player, destination)
     local char = player.Character
     if char and char.PrimaryPart then
         local currentPos = char.PrimaryPart.Position
-        local journeyTime = 1 -- Change this value to make teleporting faster or slower
+        local journeyTime = 0.7 -- Change this value to make teleporting faster or slower
         local startTime = tick()
         teleportConnection = RunService.RenderStepped:Connect(function()
             local t = (tick() - startTime) / journeyTime
