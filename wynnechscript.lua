@@ -433,7 +433,7 @@ end,
 })
 
 Page.Button({
-    Text = "flying lucky block tp V key bind (sometimes you may die due to anticheat im working on a fix)",
+    Text = "flying lucky block tp V key bind (may die due to anticheat)",
     Callback = function()
      local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
