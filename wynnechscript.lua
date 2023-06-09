@@ -77,16 +77,22 @@ animation:Play()
 Page.Button({
     Text = "antiCrash",
     Callback = function()
-  function AntiCrash()
+function AntiCrash()
     local RunService = game:GetService("RunService")
     local user = game:GetService("Players").LocalPlayer
 
     function Part1()
         RunService.RenderStepped:Connect(function() 
-            for _, item in ipairs(user.Backpack:GetChildren()) do
-                if item.Name == "-" then 
-                    item:Destroy() 
-                end 
+            local success, error = pcall(function()  -- Protect the function with pcall
+                for _, item in ipairs(user.Backpack:GetChildren()) do
+                    if item.Name == "-" then 
+                        item:Destroy() 
+                    end 
+                end
+            end)
+
+            if not success then
+                warn("Error occurred: " .. tostring(error))  -- Print the error if something went wrong
             end
         end)
     end
@@ -110,25 +116,56 @@ Page.Button({
     end
 
     function aaa()
-        RunService.RenderStepped:Connect(function() 
+        local connection = RunService.RenderStepped:Connect(function()  -- Store the connection
+            local success, error = pcall(function()  -- Protect the function with pcall
+                for _, item in ipairs(user.Backpack:GetChildren()) do
+                    if item.Name == "-" then 
+                        nou()
+                    end 
+                end
+            end)
+
+            if not success then
+                warn("Error occurred: " .. tostring(error))  -- Print the error if something went wrong
+            end
+        end)
+
+        -- Disconnect the connection when it's no longer needed (for example, when the game ends)
+        -- game:GetService("Players").PlayerRemoving:Connect(function(plr)
+        --     if plr == user then
+        --         connection:Disconnect()
+        --     end
+        -- end)
+    end
+
+    local connection = RunService.RenderStepped:Connect(function()  -- Store the connection
+        local success, error = pcall(function()  -- Protect the function with pcall
             for _, item in ipairs(user.Backpack:GetChildren()) do
                 if item.Name == "-" then 
-                    nou()
+                    user.Backpack:ClearAllChildren() 
                 end 
             end
         end)
-    end
 
-    RunService.RenderStepped:Connect(function() 
-        for _, item in ipairs(user.Backpack:GetChildren()) do
-            if item.Name == "-" then 
-                user.Backpack:ClearAllChildren() 
-            end 
+        if not success then
+            warn("Error occurred: " .. tostring(error))  -- Print the error if something went wrong
         end
     end)
 
-    Part1()
-    aaa()
+    -- Disconnect the connection when it's no longer needed (for example, when the game ends)
+    -- game:GetService("Players").PlayerRemoving:Connect(function(plr)
+    --     if plr == user then
+    --         connection:Disconnect()
+    --     end
+    -- end)
+
+    if Part1 and typeof(Part1) == "function" then  -- Check if the function exists before calling it
+        Part1()
+    end
+
+    if aaa and typeof(aaa) == "function" then  -- Check if the function exists before calling it
+        aaa()
+    end
 end
 
     end,
