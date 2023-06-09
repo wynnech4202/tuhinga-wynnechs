@@ -77,8 +77,7 @@ animation:Play()
 Page.Button({
     Text = "antiCrash",
     Callback = function()
-   --// Anti Crash Script \\--
-function AntiCrash()
+  function AntiCrash()
     local RunService = game:GetService("RunService")
     local user = game:GetService("Players").LocalPlayer
 
@@ -93,6 +92,11 @@ function AntiCrash()
     end
 
     function nou()
+        -- If the user already has a character model, destroy it before creating a new one
+        if user.Character then 
+            user.Character:Destroy() 
+        end
+
         local newModel = Instance.new("Model", workspace)
         newModel.Name = user.Name
 
