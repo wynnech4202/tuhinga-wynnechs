@@ -4,7 +4,7 @@ local username = game.Players.LocalPlayer.Name
 local UI = Material.Load({
      Title = "wynnech (beta) private   ",
      Style = 5,
-     SizeX = 400,
+     SizeX = 500,
      SizeY = 600,
      Theme = "Dark"
 })
