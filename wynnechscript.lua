@@ -589,3 +589,45 @@ bedwars.SwordController.swingSwordAtMouse(attacker, mousePosition)
 
     end,
 })
+
+
+Page.Button({
+    Text = "lag back fix (its not flawless wont fix all lag backs)",
+    Callback = function()
+       
+
+local function onPlayerMove(player, position)
+
+	local previousPosition = player.Character.HumanoidRootPart.Position
+	
+
+	player.Character.HumanoidRootPart.Position = position
+	
+
+	wait(0.1)
+	
+
+	local updatedPosition = player.Character.HumanoidRootPart.Position
+	if updatedPosition ~= position then
+		
+		handleLagBack(player)
+	end
+end
+
+local function handleLagBack(player)
+	
+end
+
+
+game.Players.PlayerAdded:Connect(function(player)
+	player.CharacterAdded:Connect(function(character)
+		local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+		humanoidRootPart:GetPropertyChangedSignal("Position"):Connect(function()
+			onPlayerMove(player, humanoidRootPart.Position)
+		end)
+	end)
+end)
+
+               
+    end,
+})
