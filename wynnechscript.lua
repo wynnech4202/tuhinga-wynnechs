@@ -550,12 +550,12 @@ Page.Button({
     Callback = function()
        
 local function performServerHitVerification(attacker, target)
-    
+   
 end
 
 
 local function calculatePredictiveAim(attacker, target)
-    
+
 end
 
 
@@ -568,16 +568,16 @@ debug.setconstant(bedwars.SwordController.swingSwordAtMouse, 27, "raycast")
 debug.setupvalue(bedwars.SwordController.swingSwordAtMouse, 4, bedwars.QueryUtil)
 
 bedwars.SwordController.swingSwordAtMouse = function(attacker, mousePosition)
-    
-    local predictedAimPosition = calculatePredictiveAim(attacker, target)
 
-    
+    local predictedAimPosition = calculatePredictiveAim(attacker, mousePosition)
+
+
     local hitTarget = bedwars.QueryUtil.Raycast(predictedAimPosition)
 
-    
+
     local isValidHit = performServerHitVerification(attacker, hitTarget)
 
-    
+
     if isValidHit then
         originalSwingSwordAtMouse(attacker, mousePosition)
     end
@@ -585,6 +585,7 @@ end
 
 
 bedwars.SwordController.swingSwordAtMouse(attacker, mousePosition)
+
 
     end,
 })
