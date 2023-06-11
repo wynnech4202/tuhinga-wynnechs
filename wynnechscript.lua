@@ -539,3 +539,52 @@ end)
 
     end,
 })
+
+local Page = UI.New({
+    Title = "utility"
+})
+
+
+Page.Button({
+    Text = "hit fix V2 and hit prediction",
+    Callback = function()
+       
+local function performServerHitVerification(attacker, target)
+    
+end
+
+
+local function calculatePredictiveAim(attacker, target)
+    
+end
+
+
+local originalSwingSwordAtMouse = bedwars.SwordController.swingSwordAtMouse
+
+
+debug.setconstant(bedwars.SwordController.swingSwordAtMouse, 27, "raycast")
+
+
+debug.setupvalue(bedwars.SwordController.swingSwordAtMouse, 4, bedwars.QueryUtil)
+
+bedwars.SwordController.swingSwordAtMouse = function(attacker, mousePosition)
+    
+    local predictedAimPosition = calculatePredictiveAim(attacker, target)
+
+    
+    local hitTarget = bedwars.QueryUtil.Raycast(predictedAimPosition)
+
+    
+    local isValidHit = performServerHitVerification(attacker, hitTarget)
+
+    
+    if isValidHit then
+        originalSwingSwordAtMouse(attacker, mousePosition)
+    end
+end
+
+
+bedwars.SwordController.swingSwordAtMouse(attacker, mousePosition)
+
+    end,
+})
