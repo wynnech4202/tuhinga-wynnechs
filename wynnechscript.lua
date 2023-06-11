@@ -592,63 +592,9 @@ bedwars.SwordController.swingSwordAtMouse(attacker, mousePosition)
 
 
 Page.Button({
-    Text = "lag back fix (its not flawless wont fix all lag backs)",
+    Text = "lag back fix  still in progress (its not flawless wont fix all lag backs)",
     Callback = function()
-       local MAX_ALLOWED_DISTANCE = 0 -- Maximum allowed distance for lag backs
-
-local function PredictMovement(player, currentPosition, currentVelocity, deltaTime)
-    -- Perform client-side prediction based on the current position and velocity
-    local predictedPosition = currentPosition + currentVelocity * deltaTime
-
-    -- Apply the predicted position to the player's character
-    if player.Character and player.Character.PrimaryPart then
-        player.Character.PrimaryPart.CFrame = CFrame.new(predictedPosition)
-    end
-end
-
-local function CorrectLagBack(player, previousPosition)
-    -- Check if the player's current position is too far from their previous position
-    local currentPosition = player.Character and player.Character.PrimaryPart and player.Character.PrimaryPart.Position
-    if currentPosition and previousPosition then
-        local distance = (currentPosition - previousPosition).Magnitude
-        if distance > MAX_ALLOWED_DISTANCE then
-            -- Teleport the player back to their previous position to correct the lag back
-            player.Character.PrimaryPart.CFrame = CFrame.new(previousPosition)
-        end
-    end
-end
-
-game.Players.PlayerAdded:Connect(function(player)
-    local previousPosition = player.Character and player.Character.PrimaryPart and player.Character.PrimaryPart.Position
-    local previousTime = tick()
-
-    player.CharacterAdded:Connect(function(character)
-        previousPosition = character.PrimaryPart and character.PrimaryPart.Position
-        previousTime = tick()
-    end)
-
-    game:GetService("RunService").Heartbeat:Connect(function(deltaTime)
-        local character = player.Character
-        if not character then
-            return
-        end
-
-        local currentPosition = character.PrimaryPart and character.PrimaryPart.Position
-        local currentVelocity = character.PrimaryPart and character.PrimaryPart.Velocity
-        local currentTime = tick()
-
-        if currentPosition and previousPosition and currentTime > previousTime then
-            -- Predict the player's movement based on the current position and velocity
-            PredictMovement(player, currentPosition, currentVelocity, deltaTime)
-
-            -- Check for false lag backs and correct them if necessary
-            CorrectLagBack(player, previousPosition)
-        end
-
-        previousPosition = currentPosition
-        previousTime = currentTime
-    end)
-end)
+     
 
                
     end,
