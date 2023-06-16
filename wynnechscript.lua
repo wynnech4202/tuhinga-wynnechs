@@ -391,23 +391,13 @@ Page.Button({
 })
 
 Page.Button({
-    Text = "inf fly (requires flying backpack)",
-    Callback = function()
-    
-while wait(3) do
-game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.out._NetManaged.FlyingBackpackFlap:InvokeServer()
-end
-    end,
-})
-
-
-Page.Button({
     Text = "inf fly tracking",
     Callback = function()
 local thresholdHeight = 1000  -- Define your height limit here
 local partSize = Vector3.new(1, 2000, 1)  -- Define the size of the part
 local parts = {}  -- Table to store player parts
 local isTracking = {} -- Table to store tracking flags for each player
+local RunService = game:GetService("RunService")
 
 local function sendMessageToAllPlayers(message)
     local Players = game:GetService("Players")
@@ -434,7 +424,7 @@ local function sendMessageToAllPlayers(message)
     end
 end
 
-while true do
+local function updateParts()
     for i, player in pairs(game.Players:GetPlayers()) do
         local character = player.Character
         if character and character:IsDescendantOf(workspace) then
@@ -466,9 +456,9 @@ while true do
             end
         end
     end
-    wait(0.1) -- Reduced delay to make tracking faster
 end
 
+RunService.Heartbeat:Connect(updateParts)
 
 end,
 })
