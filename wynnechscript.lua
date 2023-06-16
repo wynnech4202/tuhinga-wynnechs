@@ -313,17 +313,6 @@ end
     end,
 })
 
-Page.Button({
-    Text = "hang glider disabler",
-    Callback = function()
- 
-while wait()do
-local ohTable1 = {}
-
-game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.out._NetManaged.HangGliderUse:FireServer(ohTable1)
-end
-    end,
-})
 
 Page.Button({
     Text = "flying lucky block notification",
@@ -461,73 +450,6 @@ end
 RunService.Heartbeat:Connect(updateParts)
 
 end,
-})
-
-Page.Button({
-    Text = "flying lucky block tp V key bind (may die due to anticheat)",
-    Callback = function()
-     local UserInputService = game:GetService("UserInputService")
-local Workspace = game:GetService("Workspace")
-local StarterPlayer = game:GetService("StarterPlayer")
-local RunService = game:GetService("RunService")
-local teleporting = false
-local teleportConnection
-
-local function teleport(player, destination)
-    local char = player.Character
-    if char and char.PrimaryPart then
-        local currentPos = char.PrimaryPart.Position
-        local journeyTime = 0.7 -- Change this value to make teleporting faster or slower
-        local startTime = tick()
-        teleportConnection = RunService.RenderStepped:Connect(function()
-            local t = (tick() - startTime) / journeyTime
-            if t <= 1 then
-                char:SetPrimaryPartCFrame(CFrame.new(currentPos:Lerp(destination, t)))
-            else
-                teleportConnection:Disconnect() -- Stops the teleportation when reached the destination
-                teleportConnection = nil
-            end
-        end)
-    end
-end
-
-local function aimAtBlock(destination)
-    local Camera = Workspace.CurrentCamera
-    Camera.CFrame = CFrame.new(Camera.CFrame.Position, destination)
-end
-
-UserInputService.InputBegan:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.V then
-        if teleportConnection then
-            teleportConnection:Disconnect()
-            teleportConnection = nil
-        end
-        teleporting = not teleporting
-        if teleporting then
-            print("Teleporting started")
-            StarterPlayer.CameraMode = Enum.CameraMode.LockFirstPerson
-        else
-            StarterPlayer.CameraMode = Enum.CameraMode.Classic
-            print("Teleporting stopped")
-        end
-    end
-end)
-
-RunService.Heartbeat:Connect(function()
-    if teleporting and not teleportConnection then
-        local destination = Workspace:FindFirstChild("flying_lucky_block")
-        if destination and destination:FindFirstChild("Root") then
-            teleport(game.Players.LocalPlayer, destination.Root.Position)
-            aimAtBlock(destination.Root.Position)
-        else
-            teleporting = false
-            print("No more flying lucky blocks found")
-        end
-    end
-end)
- 
-
-    end,
 })
 
 
