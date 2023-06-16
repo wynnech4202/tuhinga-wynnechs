@@ -557,7 +557,7 @@ end
 })
 
 Page.Button({
-    Text = "MutiAura V2 old (made by wynnech)",
+    Text = "MutiAura V2 makes aura better old  (made by wynnech)",
     Callback = function()
        -- Create a new ScreenGui instance
 local screenGui = Instance.new("ScreenGui")
