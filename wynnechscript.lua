@@ -380,7 +380,7 @@ Page.Button({
 })
 
 Page.Button({
-    Text = "inf fly tracking",
+    Text = "inf fly tracking (see where inf fly hackers are gonna land)",
     Callback = function()
 local thresholdHeight = 1000  -- Define your height limit here
 local partSize = Vector3.new(1, 2000, 1)  -- Define the size of the part
