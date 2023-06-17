@@ -471,19 +471,16 @@ end
 Page.Button({
     Text = "MutiAura V2 makes aura better old  (made by wynnech)",
     Callback = function()
-       -- Create a new ScreenGui instance
-local screenGui = Instance.new("ScreenGui")
+      local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "SliderGui"
 
--- Create a Frame to hold the GUI elements
 local frame = Instance.new("Frame")
-frame.Position = UDim2.new(0.8, 0, 0.2, 0) -- Position adjusted to top-right
+frame.Position = UDim2.new(0.8, 0, 0.2, 0)
 frame.Size = UDim2.new(0, 100, 0, 50)
 frame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
 frame.Parent = screenGui
 frame.Draggable = true
 
--- Create a label
 local label = Instance.new("TextLabel")
 label.Position = UDim2.new(0, 0, 0, 0)
 label.Size = UDim2.new(1, 0, 0, 25)
@@ -492,7 +489,6 @@ label.BackgroundTransparency = 1
 label.Text = "MultiAura"
 label.Parent = frame
 
--- Create a button
 local button = Instance.new("TextButton")
 button.Position = UDim2.new(0, 0, 0.5, 0)
 button.Size = UDim2.new(0, 10, 0, 20)
@@ -500,7 +496,6 @@ button.BackgroundColor3 = Color3.new(1, 0, 0)
 button.Text = ""
 button.Parent = frame
 
--- Utility Function
 function findRemoteEvent(instance)
     if instance:IsA("RemoteEvent") then
         return instance
@@ -524,44 +519,44 @@ if not remoteEvent then
 end
 
 local rs = game:GetService("RunService")
-local on = false -- Start with the toggle off
+local on = false
 
--- When the player taps the button
+function executeHeartbeat()
+    rs.Heartbeat:Connect(function()
+        if on then
+            for i = 1, 4 do
+                local args = {
+                    [1] = {
+                        [1] = {
+                            [1] = "\19",
+                            [2] = "wood_sword"
+                        }
+                    }
+                }
+                remoteEvent:FireServer(unpack(args))
+            end
+        end
+    end)
+end
+
 button.MouseButton1Click:Connect(function()
-    on = not on -- Toggle the state
-    
+    on = not on
+
     local newPos
     if on then
         newPos = UDim2.new(1, -button.AbsoluteSize.X, 0.5, 0)
         button.BackgroundColor3 = Color3.new(0, 1, 0)
-        
-        -- Start the heartbeat function when turned on
-        rs.Heartbeat:Connect(function()
-            if on then
-                for i = 1, 4 do
-                    local args = {
-                        [1] = {
-                            [1] = {
-                                [1] = "\19",
-                                [2] = "wood_sword"
-                            }
-                        }
-                    }
-                    remoteEvent:FireServer(unpack(args))
-                end
-            end
-        end)
+        executeHeartbeat()  -- Execute the heartbeat function when button is turned on
     else
         newPos = UDim2.new(0, 0, 0.5, 0)
         button.BackgroundColor3 = Color3.new(1, 0, 0)
     end
 
-    -- Tween the button to the new position
     button:TweenPosition(newPos, "Out", "Quad", 0.5, true)
 end)
 
--- Add the screenGui to the player's playerGui
 screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
 
     end,
 })
