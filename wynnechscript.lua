@@ -566,6 +566,73 @@ screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
     end,
 })
 
+Page.Button({
+    Text = "sky wars head start (only works when i team box)",
+    Callback = function()
+   local RunService = game:GetService("RunService")
+local spawnCageFloor = game:GetService("Workspace").spawn_cage.Floor
+local maxDistance = 50 -- Maximum distance to teleport
+
+local function teleport(player, destination)
+    local char = player.Character
+    if char and char.PrimaryPart then
+        local humanoidRootPart = char:FindFirstChild("HumanoidRootPart")
+        local currentPos = char.PrimaryPart.Position
+        local journeyTime = 0.5 -- Change this value to make teleporting faster or slower
+        local distance = (destination - currentPos).Magnitude
+        
+        -- Adjust destination if it's farther than maxDistance
+        if distance > maxDistance then
+            local direction = (destination - currentPos).Unit
+            destination = currentPos + direction * maxDistance
+        end
+        
+        wait(0.9) -- Delay before teleportation begins
+        local startTime = tick()
+        local connection
+        connection = RunService.RenderStepped:Connect(function()
+            -- Check if character, PrimaryPart, and HumanoidRootPart still exist
+            if char and char.PrimaryPart and humanoidRootPart then
+                local t = (tick() - startTime) / journeyTime
+                if t <= 0.9 then
+                    char:SetPrimaryPartCFrame(CFrame.new(currentPos:Lerp(destination, t)))
+                elseif t > 0.9 and t <= 1 then
+                    -- Freeze the character earlier
+                    humanoidRootPart.Anchored = true
+                    wait(0.5) -- Freeze time
+                    -- Unfreeze the character
+                    humanoidRootPart.Anchored = false
+                    char:SetPrimaryPartCFrame(CFrame.new(destination))
+                else
+                    -- If time is up, set the character at the exact destination and disconnect
+                    char:SetPrimaryPartCFrame(CFrame.new(destination))
+                    connection:Disconnect()
+                end
+            else
+                -- If character or PrimaryPart disappeared (e.g., due to respawn), disconnect
+                connection:Disconnect()
+            end
+        end)
+    else
+        warn("No character, PrimaryPart, or HumanoidRootPart found for player:", player.Name)
+    end
+end
+
+-- Monitor 'Position' property of 'spawn_cage.Floor' object
+spawnCageFloor:GetPropertyChangedSignal("Position"):Connect(function()
+    teleport(game.Players.LocalPlayer, game:GetService("Workspace").RespawnView.Position)
+end)
+
+-- Monitor 'spawn_cage.Floor' object deletion
+spawnCageFloor.AncestryChanged:Connect(function()
+    if spawnCageFloor.Parent == nil then
+        teleport(game.Players.LocalPlayer, game:GetService("Workspace").RespawnView.Position)
+    end
+end)
+
+    end,
+})
+
 
 local Page = UI.New({
     Title = "fix's"
