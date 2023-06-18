@@ -469,7 +469,7 @@ end
 })
 
 Page.Button({
-    Text = "MutiAura V2 makes aura better old  (made by wynnech)",
+    Text = "MutiAura V2 old  (made by wynnech)",
     Callback = function()
      function createGui()
     local screenGui = Instance.new("ScreenGui")
@@ -640,6 +640,88 @@ while true do
 end
     end,
 })
+
+Page.Button({
+    Text = "LifeSaver (when the next hit is a death hit it will you tp up)",
+    Callback = function()
+       local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+local character = player.Character
+local humanoid = character and character:FindFirstChild("Humanoid")
+
+
+local minimumHealth = 10
+local teleportHeight = 300
+local damageBufferDuration = 2 
+
+
+local damageBuffer = {}
+local lastHealth = humanoid and humanoid.Health or 0
+local totalDamage = 0
+
+
+local function checkHealth()
+    if not character or not humanoid then 
+        character = player.Character
+        humanoid = character and character:FindFirstChild("Humanoid")
+        if not character or not humanoid then return end
+    end
+
+    local healthDiff = lastHealth - humanoid.Health
+    lastHealth = humanoid.Health
+
+    if healthDiff > 0 then
+        
+        totalDamage = totalDamage + healthDiff
+        table.insert(damageBuffer, {time = tick(), damage = healthDiff})
+
+        
+        while damageBuffer[1] and tick() - damageBuffer[1].time > damageBufferDuration do
+            totalDamage = totalDamage - damageBuffer[1].damage
+            table.remove(damageBuffer, 1)
+        end
+
+        
+        local averageDamage = #damageBuffer > 0 and totalDamage / #damageBuffer or 0
+
+        
+        if humanoid.Health - averageDamage <= minimumHealth then
+            local currentPos = character.HumanoidRootPart.Position
+            local teleportPos = Vector3.new(currentPos.X, currentPos.Y + teleportHeight, currentPos.Z)
+
+            
+            character.HumanoidRootPart.CFrame = CFrame.new(teleportPos)
+
+            
+            repeat
+                RunService.Heartbeat:Wait()
+            until humanoid.Health >= humanoid.MaxHealth
+
+           
+            if workspace:FindPartOnRay(Ray.new(currentPos, Vector3.new(0, -1, 0))) then
+                
+                character.HumanoidRootPart.CFrame = CFrame.new(currentPos)
+            end
+        end
+    end
+end
+
+
+RunService.Heartbeat:Connect(checkHealth)
+
+
+player.CharacterAdded:Connect(function()
+    character = player.Character
+    humanoid = character:FindFirstChild("Humanoid")
+    lastHealth = humanoid and humanoid.Health or 0
+    totalDamage = 0
+    damageBuffer = {}
+end)
+
+    end,
+})
+
 
 
 local Page = UI.New({
