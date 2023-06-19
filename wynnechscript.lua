@@ -454,21 +454,6 @@ end,
 
 
 Page.Button({
-    Text = "jug map destroyer (requires jug rage blade)",
-    Callback = function()
-       
-while wait()do
-local ohTable1 = {
-	["swordType"] = "juggernaut_rage_blade",
-	["player"] = game:GetService("Players").LocalPlayer
-}
-
-game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.out._NetManaged.SwordSwingMiss:FireServer(ohTable1)
-end
-    end,
-})
-
-Page.Button({
     Text = "MutiAura V2 old  (made by wynnech)",
     Callback = function()
      function createGui()
@@ -642,7 +627,7 @@ end
 })
 
 Page.Button({
-    Text = "LifeSaver (when the next hit is a death hit it will you tp up)",
+    Text = "LifeSaver (when the next hit is a death hit it will tp you up)",
     Callback = function()
        local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
