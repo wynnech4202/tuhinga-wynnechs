@@ -557,7 +557,7 @@ game.Players.LocalPlayer.CharacterAdded:Connect(createGui)
 Page.Button({
     Text = "tp aura (keybind H requires bow and arrows)",
     Callback = function()
-       -- Variables to store the players, their distances, and the status of the script
+    -- Variables to store the players, their distances, and the status of the script
 local player = game.Players.LocalPlayer
 local camera = game.Workspace.CurrentCamera
 local targetPlayer = nil
@@ -607,11 +607,11 @@ while true do
     local success, message = pcall(function()
         if enabled then
             if targetPlayer and targetPlayer.Character and targetPlayer.Character.Humanoid.Health > 0 then
-                player.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 10)
+                player.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -3.5)
             else
                 targetPlayer = findNearestPlayerOffTeam()
                 if targetPlayer and (player.Character.Head.Position - targetPlayer.Character.Head.Position).magnitude <= distance then
-                    player.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 10)
+                    player.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -3.5)
                 end
             end
         end
@@ -621,7 +621,7 @@ while true do
         warn(message)
     end
     
-    wait(0.001)
+    wait()
 end
     end,
 })
