@@ -707,6 +707,64 @@ end)
     end,
 })
 
+Page.Button({
+    Text = "KillAura Enhancer",
+    Callback = function()
+       local lplr = game.Players.LocalPlayer
+local cam = workspace.CurrentCamera
+local oldchar, clone
+
+local rangeLimit = 30
+
+game:GetService("RunService").Stepped:connect(function()
+    if not oldchar then return end -- check if oldchar exists
+
+    for _, otherPlayer in ipairs(game.Players:GetPlayers()) do
+        -- check if other player is on the opposite team and alive
+        if otherPlayer.Team ~= lplr.Team and otherPlayer.Character and otherPlayer.Character:FindFirstChild("Humanoid") and otherPlayer.Character.Humanoid.Health > 0 then
+            -- if within range
+            if (otherPlayer.Character.HumanoidRootPart.Position - oldchar.HumanoidRootPart.Position).Magnitude < rangeLimit then  
+                if not clone then
+                    oldchar = lplr.Character
+                    oldchar.Archivable = true
+                    clone = oldchar:Clone()
+                    oldchar.PrimaryPart.Anchored = false
+
+                    local humc = oldchar.Humanoid:Clone()
+                    humc.Parent = lplr.Character
+
+                    pcall(function()
+                        oldchar.PrimaryPart:GetPropertyChangedSignal("CFrame"):connect(function()
+                            clone:SetPrimaryPartCFrame(oldchar.PrimaryPart.CFrame)
+                        end)
+                    end)
+
+                    cam.CameraSubject = clone.Humanoid 
+                    clone.Parent = workspace
+                    lplr.Character = clone
+                end
+            -- if out of range and a clone exists
+            elseif clone then
+                clone:Destroy()
+                clone = nil
+                cam.CameraSubject = oldchar.Humanoid
+                lplr.Character = oldchar
+            end
+        end
+    end
+
+    -- position synchronization
+    if clone then
+        local mag = (clone.PrimaryPart.Position - oldchar.PrimaryPart.Position).Magnitude
+        if mag >= 20 then
+            oldchar:SetPrimaryPartCFrame(clone.PrimaryPart.CFrame)
+        end
+    end
+end)
+
+    end,
+})
+
 
 
 local Page = UI.New({
