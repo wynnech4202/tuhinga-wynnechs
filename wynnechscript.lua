@@ -710,55 +710,67 @@ end)
 Page.Button({
     Text = "KillAura Enhancer",
     Callback = function()
-       local lplr = game.Players.LocalPlayer
-local cam = workspace.CurrentCamera
-local oldchar, clone
+local lplr = game.Players.LocalPlayer
+local runService = game:GetService("RunService")
 
-local rangeLimit = 30
+local clone = nil
 
-game:GetService("RunService").Stepped:connect(function()
-    if not oldchar then return end -- check if oldchar exists
+local rangeLimit = 30 -- Range limit
+
+local function findClosestEnemy()
+    local oldchar = lplr.Character
+    local closestPlayer = nil
+    local closestDistance = rangeLimit
 
     for _, otherPlayer in ipairs(game.Players:GetPlayers()) do
         -- check if other player is on the opposite team and alive
-        if otherPlayer.Team ~= lplr.Team and otherPlayer.Character and otherPlayer.Character:FindFirstChild("Humanoid") and otherPlayer.Character.Humanoid.Health > 0 then
+        if otherPlayer ~= lplr and otherPlayer.Team ~= lplr.Team and otherPlayer.Character and otherPlayer.Character:FindFirstChild("Humanoid") and otherPlayer.Character.Humanoid.Health > 0 then
+            local distance = (otherPlayer.Character.HumanoidRootPart.Position - oldchar.HumanoidRootPart.Position).Magnitude
             -- if within range
-            if (otherPlayer.Character.HumanoidRootPart.Position - oldchar.HumanoidRootPart.Position).Magnitude < rangeLimit then  
-                if not clone then
-                    oldchar = lplr.Character
-                    oldchar.Archivable = true
-                    clone = oldchar:Clone()
-                    oldchar.PrimaryPart.Anchored = false
-
-                    local humc = oldchar.Humanoid:Clone()
-                    humc.Parent = lplr.Character
-
-                    pcall(function()
-                        oldchar.PrimaryPart:GetPropertyChangedSignal("CFrame"):connect(function()
-                            clone:SetPrimaryPartCFrame(oldchar.PrimaryPart.CFrame)
-                        end)
-                    end)
-
-                    cam.CameraSubject = clone.Humanoid 
-                    clone.Parent = workspace
-                    lplr.Character = clone
-                end
-            -- if out of range and a clone exists
-            elseif clone then
-                clone:Destroy()
-                clone = nil
-                cam.CameraSubject = oldchar.Humanoid
-                lplr.Character = oldchar
+            if distance < closestDistance then
+                closestPlayer = otherPlayer
+                closestDistance = distance
             end
         end
     end
 
-    -- position synchronization
+    return closestPlayer
+end
+
+local function createClone()
+    local oldchar = lplr.Character
+    oldchar.Archivable = true
+    clone = oldchar:Clone()
+    clone.Parent = workspace
+    clone.Name = "Clone"
+    clone.Humanoid.Name = "CloneHumanoid"
+    clone.HumanoidRootPart.Transparency = 1
+    clone.HumanoidRootPart.CanCollide = false
+end
+
+local function hideClone()
     if clone then
-        local mag = (clone.PrimaryPart.Position - oldchar.PrimaryPart.Position).Magnitude
-        if mag >= 20 then
-            oldchar:SetPrimaryPartCFrame(clone.PrimaryPart.CFrame)
-        end
+        clone.HumanoidRootPart.Transparency = 1
+        clone.HumanoidRootPart.CanCollide = false
+    end
+end
+
+local function showAndTeleportClone(closestPlayer)
+    if clone and closestPlayer then
+        clone:SetPrimaryPartCFrame(closestPlayer.Character.HumanoidRootPart.CFrame)
+        clone.HumanoidRootPart.Transparency = 0.5
+        clone.HumanoidRootPart.CanCollide = true
+    end
+end
+
+createClone()
+
+runService.Heartbeat:Connect(function()
+    local closestPlayer = findClosestEnemy()
+    if closestPlayer then
+        showAndTeleportClone(closestPlayer)
+    else
+        hideClone()
     end
 end)
 
