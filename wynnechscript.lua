@@ -778,6 +778,22 @@ end)
 })
 
 
+Page.Button({
+    Text = "instant kill requires at least wood scythe",
+    Callback = function()
+       while task.wait()
+do local args = {
+    [1] = {
+        ["weapon"] = "wood_scythe",
+        ["chargeRatio"] = 0.99
+    }
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("SwordSwingMiss"):FireServer(unpack(args))
+end
+    end,
+})
+
 
 local Page = UI.New({
     Title = "fix's"
