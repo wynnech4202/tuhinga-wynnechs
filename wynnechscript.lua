@@ -708,7 +708,7 @@ end)
 })
 
 Page.Button({
-    Text = "35 cframe exploit",
+    Text = "35 cframe fast exploit",
     Callback = function()
       repeat 
     task.wait()
