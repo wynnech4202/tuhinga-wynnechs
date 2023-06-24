@@ -554,77 +554,8 @@ game.Players.LocalPlayer.CharacterAdded:Connect(createGui)
     end,
 })
 
-Page.Button({
-    Text = "tp aura (keybind H requires bow and arrows)",
-    Callback = function()
-    -- Variables to store the players, their distances, and the status of the script
-local player = game.Players.LocalPlayer
-local camera = game.Workspace.CurrentCamera
-local targetPlayer = nil
-local distance = 1000000000
-local enabled = false
-local team = player.Team
-local cameraSubject = player.Character.Humanoid
 
--- Function to find the nearest player on a different team
-function findNearestPlayerOffTeam()
-    local nearestPlayer = nil
-    local nearestDistance = math.huge
-    
-    for _, currentPlayer in pairs(game.Players:GetPlayers()) do
-        if currentPlayer ~= player and currentPlayer.Team ~= team and currentPlayer.Character and currentPlayer.Character.Humanoid.Health > 0 then
-            local currentDistance = (currentPlayer.Character.Head.Position - player.Character.Head.Position).magnitude
-            if currentDistance < nearestDistance then
-                nearestPlayer = currentPlayer
-                nearestDistance = currentDistance
-            end
-        end
-    end
-    
-    return nearestPlayer
-end
 
--- Function to toggle the status of the script
-function toggleTeleportation()
-    enabled = not enabled
-end
-
--- Key bind to start and stop the teleportation and enter free-cam mode
-game:GetService("UserInputService").InputBegan:Connect(function(inputObject, gameProcessedEvent)
-    if inputObject.KeyCode == Enum.KeyCode.H then
-        toggleTeleportation()
-        if enabled then
-            cameraSubject = nil
-        else
-            cameraSubject = player.Character.Humanoid
-        end
-        camera.CameraSubject = cameraSubject
-    end
-end)
-
--- Main loop to check for the nearest player on a different team and teleport the player's character behind the target player
-while true do
-    local success, message = pcall(function()
-        if enabled then
-            if targetPlayer and targetPlayer.Character and targetPlayer.Character.Humanoid.Health > 0 then
-                player.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -3.5)
-            else
-                targetPlayer = findNearestPlayerOffTeam()
-                if targetPlayer and (player.Character.Head.Position - targetPlayer.Character.Head.Position).magnitude <= distance then
-                    player.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -3.5)
-                end
-            end
-        end
-    end)
-    
-    if not success then
-        warn(message)
-    end
-    
-    wait()
-end
-    end,
-})
 
 Page.Button({
     Text = "LifeSaver (when the next hit is a death hit it will tp you up)",
