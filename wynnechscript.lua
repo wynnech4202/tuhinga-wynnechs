@@ -22,59 +22,6 @@ Page.Button({
 
 
 Page.Button({
-    Text = "hub",
-    Callback = function()
-       local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = game.Players.LocalPlayer.PlayerGui
-
-local TextLabel = Instance.new("TextLabel")
-TextLabel.Parent = ScreenGui
-TextLabel.Text = "wynnech\nprivate"
-TextLabel.BackgroundTransparency = 0.4
-TextLabel.Size = UDim2.new(0, 200, 0, 100)
-TextLabel.Position = UDim2.new(0, 10, 1, -110)
-TextLabel.AnchorPoint = Vector2.new(0, 1)
-TextLabel.TextSize = 20
-TextLabel.TextWrapped = true
-TextLabel.TextColor3 = Color3.new(0.6, 0.2, 0.8)
-TextLabel.BackgroundColor3 = Color3.new(0, 0, 0)
-TextLabel.BorderColor3 = Color3.new(0.6, 0.2, 0.8)
-TextLabel.BorderSizePixel = 4
-TextLabel.Rounded = true
-TextLabel.ClipsDescendants = true
-
-local Box = Instance.new("Frame")
-Box.Parent = TextLabel
-Box.Size = UDim2.new(1, 0, 1, 0)
-Box.BackgroundColor3 = Color3.new(0, 0, 0)
-Box.BackgroundTransparency = 0.6
-Box.BorderColor3 = Color3.new(0.6, 0.2, 0.8)
-Box.BorderSizePixel = 4
-Box.Rounded = true
-
-TextLabel.MouseButton1Down:Connect(function()
-    local mouse = game.Players.LocalPlayer:GetMouse()
-    local dragStart = mouse.Hit.p
-    local dragStartPos = TextLabel.Position
-    local function update(input)
-        local delta = input.p - dragStart
-        TextLabel.Position = UDim2.new(0, dragStartPos.X.Offset + delta.X, 1, dragStartPos.Y.Offset - delta.Y)
-    end
-    mouse.Move:Connect(update)
-    mouse.Button1Up:Connect(function()
-        mouse.Move:Disconnect()
-    end)
-end)
-
-local animation = TweenService:Create(TextLabel, TweenInfo.new(2, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -100, 0.5, -50)})
-animation:Play()
-
-
-    end,
-})
-
-
-Page.Button({
     Text = "antiCrash",
     Callback = function()
 function AntiCrash()
@@ -304,64 +251,6 @@ end)
 end,
 })
 
-Page.Button({
-    Text = "fps checker",
-    Callback = function()
-while wait(3)do
-    setfpscap(150)
-end
-    end,
-})
-
-
-Page.Button({
-    Text = "flying lucky block notification",
-    Callback = function()
-    local Workspace = game:GetService("Workspace")
-
--- Function to send a message to all players
-local function sendMessageToAllPlayers(message)
-    local Players = game:GetService("Players")
-
-    for i, player in pairs(Players:GetPlayers()) do
-        local playerGui = player:FindFirstChild("PlayerGui")
-        if playerGui then
-            local ScreenGui = Instance.new("ScreenGui")
-            local TextLabel = Instance.new("TextLabel")
-
-            TextLabel.Size = UDim2.new(0, 200, 0, 50)
-            TextLabel.Position = UDim2.new(1, -210, 1, -60) -- Position changed to bottom right
-            TextLabel.BackgroundTransparency = 0.5
-            TextLabel.BackgroundColor3 = Color3.new(0, 0, 0)
-            TextLabel.TextColor3 = Color3.new(1, 1, 1)
-            TextLabel.Text = message
-            TextLabel.Parent = ScreenGui
-
-            ScreenGui.Parent = playerGui
-
-            wait(5)
-            ScreenGui:Destroy()
-        end
-    end
-end
-
--- Function to check if the flying_lucky_block with its Root has spawned
-local function checkFlyingLuckyBlock()
-    if Workspace:FindFirstChild("flying_lucky_block") then
-        local flying_lucky_block = Workspace.flying_lucky_block
-        if flying_lucky_block:FindFirstChild("Root") then
-            sendMessageToAllPlayers("A flying Lucky Block has spawned!")
-        end
-    end
-end
-
--- Run the checkFlyingLuckyBlock function every second
-while wait(1) do
-    checkFlyingLuckyBlock()
-end
-
- end,
-})
 
 Page.Button({
     Text = "vape",
