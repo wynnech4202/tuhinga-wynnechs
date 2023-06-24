@@ -736,107 +736,25 @@ until nil
     end,
 })
 
-local Page = UI.New({
-    Title = "fix's"
-})
-
-
 Page.Button({
-    Text = "hit fix V2 and hit prediction",
+    Text = "improved instant kill",
     Callback = function()
-       
-local function performServerHitVerification(attacker, target)
-   
-end
-
-
-local function calculatePredictiveAim(attacker, target)
-
-end
-
-
-local originalSwingSwordAtMouse = bedwars.SwordController.swingSwordAtMouse
-
-
-debug.setconstant(bedwars.SwordController.swingSwordAtMouse, 27, "raycast")
-
-
-debug.setupvalue(bedwars.SwordController.swingSwordAtMouse, 4, bedwars.QueryUtil)
-
-bedwars.SwordController.swingSwordAtMouse = function(attacker, mousePosition)
-
-    local predictedAimPosition = calculatePredictiveAim(attacker, mousePosition)
-
-
-    local hitTarget = bedwars.QueryUtil.Raycast(predictedAimPosition)
-
-
-    local isValidHit = performServerHitVerification(attacker, hitTarget)
-
-
-    if isValidHit then
-        originalSwingSwordAtMouse(attacker, mousePosition)
+   task.spawn(function()
+    while wait() do
+        game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("SwordSwingMiss"):FireServer({
+            ["weapon"] = game:GetService("ReplicatedStorage").Items.diamond_great_hammer,
+            ["chargeRatio"] = 1
+        })
+        game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("SwordSwingMiss"):FireServer({
+            ["weapon"] = game:GetService("ReplicatedStorage").Items.diamond_great_hammer_2,
+            ["chargeRatio"] = 1
+        })
+        game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("SwordSwingMiss"):FireServer({
+            ["weapon"] = game:GetService("ReplicatedStorage").Items.diamond_great_hammer_3,
+            ["chargeRatio"] = 1
+        })
     end
-end
-
-
-bedwars.SwordController.swingSwordAtMouse(attacker, mousePosition)
-
-
-    end,
-})
-
-
-Page.Button({
-    Text = "lag back fix  still in progress (its not flawless wont fix all lag backs)",
-    Callback = function()
-     
-
-               
-    end,
-})
-
-Page.Button({
-    Text = "Tracking system fix (not flawless)",
-    Callback = function()
-      local WEAPON_RANGE = 18
-
-local function handleHit(target)
-    print("Hit target: " .. target.Name)
-end
-
-local function performHitDetection()
-    local character = game.Players.LocalPlayer.Character
-    local rootPart = character:WaitForChild("HumanoidRootPart")
-
-    local direction = (rootPart.CFrame.LookVector).unit
-    local destination = rootPart.Position + direction * WEAPON_RANGE
-
-    local result = workspace:Raycast(rootPart.Position, direction * WEAPON_RANGE)
-
-    if result then
-        local hitPart = result.Instance
-        local humanoid = hitPart.Parent:FindFirstChildOfClass("Humanoid")
-        if humanoid and humanoid.Parent ~= character then
-            handleHit(hitPart.Parent)
-        end
-    end
-
-    local predictedHitPosition = destination + (direction * (result and result.Distance or WEAPON_RANGE))
-
-    local predictedResult = workspace:Raycast(rootPart.Position, (predictedHitPosition - rootPart.Position).unit * WEAPON_RANGE)
-
-    if predictedResult then
-        local predictedHitPart = predictedResult.Instance
-        local predictedHumanoid = predictedHitPart.Parent:FindFirstChildOfClass("Humanoid")
-        if predictedHumanoid and predictedHumanoid.Parent ~= character then
-            handleHit(predictedHitPart.Parent)
-        end
-    end
-end
-
-game.Players.LocalPlayer:GetMouse().Button1Down:Connect(performHitDetection)
-
+end)
 
     end,
 })
