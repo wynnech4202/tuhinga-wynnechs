@@ -730,7 +730,7 @@ Page.Button({
     game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("SpiritBridgeEnter"):InvokeServer(unpack(args))
 
     -- Set walk speed to 30
-    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 50
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 60
 until nil
 
     end,
