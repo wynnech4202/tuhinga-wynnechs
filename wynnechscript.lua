@@ -710,8 +710,7 @@ end)
 Page.Button({
     Text = "35 cframe fast exploit",
     Callback = function()
-      repeat 
-    task.wait()
+    while wait() do
     local args = {
         [1] = {
             ["partPositions"] = {
@@ -729,9 +728,9 @@ Page.Button({
 
     game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("SpiritBridgeEnter"):InvokeServer(unpack(args))
 
-    -- Set walk speed to 30
-    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 60
-until nil
+    -- Set walk speed to 60
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 69
+end
 
     end,
 })
