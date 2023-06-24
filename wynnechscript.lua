@@ -779,40 +779,18 @@ end)
 
 
 Page.Button({
-    Text = "instant kill requires at least wood scythe",
+    Text = "instant kill",
     Callback = function()
-          local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local proximity = 30 
-
-while wait() do
-    local myPlayer = Players.LocalPlayer
-    local myCharacter = myPlayer.Character
-    local myTeam = myPlayer.Team
-
-    if myCharacter and myCharacter:FindFirstChild("HumanoidRootPart") then
-        local myPosition = myCharacter.HumanoidRootPart.Position
-
-        for _, player in pairs(Players:GetPlayers()) do
-            if player.Team ~= myTeam and player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChild("Humanoid") then
-                local theirPosition = player.Character.HumanoidRootPart.Position
-                local distance = (myPosition - theirPosition).Magnitude
-
-                if distance < proximity and player.Character.Humanoid.Health > 0 then
-                    local args = {
-                        [1] = {
-                            ["weapon"] = "wood_scythe",
-                            ["chargeRatio"] = 0
+       				while wait() do
+				local args = {
+                            [1] = {
+                                ["weapon"] = "diamond_great_hammer",
+                                ["chargeRatio"] = 1
+                            }
                         }
-                    }
 
-                    local SwordSwingMiss = ReplicatedStorage:WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("SwordSwingMiss")
-                    SwordSwingMiss:FireServer(unpack(args))
-                end
-            end
-        end
-    end
-end
+                        game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("SwordSwingMiss"):FireServer(unpack(args))
+                        end
     end,
 })
 
