@@ -778,23 +778,6 @@ end)
 })
 
 
-Page.Button({
-    Text = "instant kill",
-    Callback = function()
-       				while wait() do
-				local args = {
-                            [1] = {
-                                ["weapon"] = "diamond_great_hammer",
-                                ["chargeRatio"] = 1
-                            }
-                        }
-
-                        game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("SwordSwingMiss"):FireServer(unpack(args))
-                        end
-    end,
-})
-
-
 local Page = UI.New({
     Title = "fix's"
 })
