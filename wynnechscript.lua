@@ -710,24 +710,29 @@ end)
 Page.Button({
     Text = "35 cframe exploit",
     Callback = function()
-       repeat task.wait()
-                local args = {
-                    [1] = {
-                        ["partPositions"] = {
-                            [1] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
-                            [2] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
-                            [3] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
-                            [4] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
-                            [5] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
-                            [6] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
-                            [7] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame)
-                        },
-                        ["partSize"] = Vector3.new(999999, 0.5, 9999.99999999999999999999)
-                    }
-                }
+      repeat 
+    task.wait()
+    local args = {
+        [1] = {
+            ["partPositions"] = {
+                [1] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
+                [2] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
+                [3] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
+                [4] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
+                [5] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
+                [6] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
+                [7] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame)
+            },
+            ["partSize"] = Vector3.new(999999, 0.5, 9999.99999999999999999999)
+        }
+    }
 
-                game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("SpiritBridgeEnter"):InvokeServer(unpack(args))
-            until nil
+    game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("SpiritBridgeEnter"):InvokeServer(unpack(args))
+
+    -- Set walk speed to 30
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 50
+until nil
+
     end,
 })
 
