@@ -781,7 +781,7 @@ end)
 Page.Button({
     Text = "instant kill requires at least wood scythe",
     Callback = function()
-      local Players = game:GetService("Players")
+          local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local proximity = 30 
 
@@ -802,7 +802,7 @@ while wait() do
                     local args = {
                         [1] = {
                             ["weapon"] = "wood_scythe",
-                            ["chargeRatio"] = 0.99
+                            ["chargeRatio"] = 0
                         }
                     }
 
@@ -813,7 +813,6 @@ while wait() do
         end
     end
 end
-
     end,
 })
 
