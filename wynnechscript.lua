@@ -530,7 +530,7 @@ end
 })
 
 Page.Button({
-    Text = "a true instant kill V2",
+    Text = "a true instant kill V3",
     Callback = function()
   task.spawn(function()
     while wait() do
