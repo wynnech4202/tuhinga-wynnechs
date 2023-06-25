@@ -502,31 +502,47 @@ end)
 })
 
 Page.Button({
-    Text = "Disabler.",
+    Text = "Disabler .",
     Callback = function()
-   while wait() do
+   
+local function InvokeSpiritBridge(args)
+    
+    local SpiritBridgeEnter = game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("SpiritBridgeEnter")
+    
+    for i=1,3 do
+        SpiritBridgeEnter:InvokeServer(unpack(args))
+    end
+end
+
+
+local LocalPlayer = game.Players.LocalPlayer
+local Character = LocalPlayer.Character
+local HumanoidRootPart = Character.HumanoidRootPart
+local CFramePosition = HumanoidRootPart.CFrame
+
+while wait() do
     local args = {
         [1] = {
             ["partPositions"] = {
-                [1] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
-                [2] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
-                [3] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
-                [4] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
-                [5] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
-                [6] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
-                [7] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame)
+                [1] = Vector3.new(CFramePosition),
+                [2] = Vector3.new(CFramePosition),
+                [3] = Vector3.new(CFramePosition),
+                [4] = Vector3.new(CFramePosition),
+                [5] = Vector3.new(CFramePosition),
+                [6] = Vector3.new(CFramePosition),
+                [7] = Vector3.new(CFramePosition)
             },
             ["partSize"] = Vector3.new(999999, 0.5, 9999.99999999999999999999)
         }
     }
 
-    for i=1,3 do
-        game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("SpiritBridgeEnter"):InvokeServer(unpack(args))
-    end
+	    
+	    InvokeSpiritBridge(args)
 
-    -- Set walk speed to 60
-    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100
+    
+    Character.Humanoid.WalkSpeed = 100
 end
+
     end,
 })
 
