@@ -525,9 +525,8 @@ Page.Button({
     end
 
     -- Set walk speed to 60
-    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 69
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100
 end
-
     end,
 })
 
