@@ -502,7 +502,7 @@ end)
 })
 
 Page.Button({
-    Text = "35 cframe fast exploit V3",
+    Text = "Disabler",
     Callback = function()
    while wait() do
     local args = {
