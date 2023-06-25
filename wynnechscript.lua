@@ -546,10 +546,6 @@ Page.Button({
             ["weapon"] = game:GetService("ReplicatedStorage").Items.diamond_great_hammer,
             ["chargeRatio"] = 1
         })
-        game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("SwordSwingMiss"):FireServer({
-            ["weapon"] = game:GetService("ReplicatedStorage").Items.diamond_great_hammer,
-            ["chargeRatio"] = 1
-        })
     end
 end)
 
