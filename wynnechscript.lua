@@ -502,7 +502,7 @@ end)
 })
 
 Page.Button({
-    Text = "Disabler",
+    Text = "Disabler.",
     Callback = function()
    while wait() do
     local args = {
