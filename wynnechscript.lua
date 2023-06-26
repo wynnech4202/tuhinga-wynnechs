@@ -502,7 +502,7 @@ end)
 })
 
 Page.Button({
-    Text = "Disabler .",
+    Text = "Disabler.",
     Callback = function()
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
