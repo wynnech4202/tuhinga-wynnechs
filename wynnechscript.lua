@@ -502,67 +502,79 @@ end)
 })
 
 Page.Button({
-    Text = "Disabler + semi god mode must be moving .",
+    Text = "Disabler + semi god mode.",
     Callback = function()
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SpiritBridgeEnter = ReplicatedStorage:WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("SpiritBridgeEnter")
-local Player = Players.LocalPlayer
-local Character = Player.Character
-local Humanoid = Character:WaitForChild("Humanoid")
-local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 
-local args = {
-    {
-        ["partPositions"] = {},
-        ["partSize"] = HumanoidRootPart.Size
-    }
-}
+local SpiritBridgeEnter = ReplicatedStorage:WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("SpiritBridgeEnter")
+
+local Player = Players.LocalPlayer
 
 local cooldown = 0.1 -- Lower cooldown
 local lastTeleportTime = 0
 
-while wait() do
-    -- Set WalkSpeed to 40 continuously
-    Humanoid.WalkSpeed = 40
+local function onStartCharacter(character)
+    local Humanoid = character:WaitForChild("Humanoid")
+    local HumanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    
+    local args = {
+        {
+            ["partPositions"] = {},
+            ["partSize"] = HumanoidRootPart.Size
+        }
+    }
 
-    -- Continuous jump loop
-    Humanoid.Jump = true
+    while wait() do
+        -- Set WalkSpeed to 40 continuously
+        Humanoid.WalkSpeed = 200
 
-    -- Teleportation logic
-    if (tick() - lastTeleportTime) > cooldown then
-        -- Update partPositions to a far away location and partSize to match the character's current state
-        local newPosition = HumanoidRootPart.Position + Vector3.new(1000, 1000, 1000)
-        args[1]["partPositions"] = { newPosition }
-        args[1]["partSize"] = HumanoidRootPart.Size
+        -- Continuous jump loop
+        Humanoid.Jump = true
 
-        -- Try teleportation and handle possible error
-        local status, err = pcall(function()
-            SpiritBridgeEnter:InvokeServer(unpack(args))
-        end)
+        -- Teleportation logic
+        if (tick() - lastTeleportTime) > cooldown then
+            -- Update partPositions to a far away location and partSize to match the character's current state
+            local newPosition = HumanoidRootPart.Position + Vector3.new(1000, 1000, 1000)
+            args[1]["partPositions"] = { newPosition }
+            args[1]["partSize"] = HumanoidRootPart.Size
 
-        if not status then
-            warn("Teleportation failed: " .. err)
-            wait() -- Shorter wait if there was an error
+            -- Try teleportation and handle possible error
+            local status, err = pcall(function()
+                SpiritBridgeEnter:InvokeServer(unpack(args))
+            end)
+
+            if not status then
+                warn("Teleportation failed: " .. err)
+                wait() -- Shorter wait if there was an error
+            end
+
+            wait() -- Shorter wait between teleportations
+
+            -- Update partPositions back to the character's current position
+            args[1]["partPositions"] = { HumanoidRootPart.Position }
+
+            -- Try teleportation and handle possible error
+            local status, err = pcall(function()
+                SpiritBridgeEnter:InvokeServer(unpack(args))
+            end)
+
+            if not status then
+                warn("Teleportation failed: " .. err)
+                wait() -- Shorter wait if there was an error
+            end
+
+            lastTeleportTime = tick() -- Reset the last teleportation time
         end
-
-        wait() -- Shorter wait between teleportations
-
-        -- Update partPositions back to the character's current position
-        args[1]["partPositions"] = { HumanoidRootPart.Position }
-
-        -- Try teleportation and handle possible error
-        local status, err = pcall(function()
-            SpiritBridgeEnter:InvokeServer(unpack(args))
-        end)
-
-        if not status then
-            warn("Teleportation failed: " .. err)
-            wait() -- Shorter wait if there was an error
-        end
-
-        lastTeleportTime = tick() -- Reset the last teleportation time
     end
+end
+
+-- Connect CharacterAdded event to the onStartCharacter function
+Player.CharacterAdded:Connect(onStartCharacter)
+
+-- If the player's character is already loaded when the script starts running, we call the function manually
+if Player.Character then
+    onStartCharacter(Player.Character)
 end
 
     end,
