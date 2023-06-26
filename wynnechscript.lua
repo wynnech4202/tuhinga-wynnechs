@@ -504,44 +504,46 @@ end)
 Page.Button({
     Text = "Disabler .",
     Callback = function()
-   
-local function InvokeSpiritBridge(args)
-    
-    local SpiritBridgeEnter = game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("SpiritBridgeEnter")
-    
-    for i=1,3 do
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SpiritBridgeEnter = ReplicatedStorage:WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("SpiritBridgeEnter")
+local Player = Players.LocalPlayer
+local Character = Player.Character
+local Humanoid = Character:WaitForChild("Humanoid")
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+local RootPartCFrame = HumanoidRootPart.CFrame
+
+local speed = 4.6 
+
+local args = {
+    {
+        ["partPositions"] = {
+            [1] = Vector3.new(RootPartCFrame),
+            [2] = Vector3.new(RootPartCFrame),
+            [3] = Vector3.new(RootPartCFrame),
+            [4] = Vector3.new(RootPartCFrame),
+            [5] = Vector3.new(RootPartCFrame),
+            [6] = Vector3.new(RootPartCFrame),
+            [7] = Vector3.new(RootPartCFrame)
+        },
+        ["partSize"] = Vector3.new(999999, 0.5, 9999.99999999999999999999)
+    }
+}
+
+local cooldown = 0.5 -- Change this to adjust the frequency of teleportation
+local lastTeleportTime = 0
+
+while wait() do
+    if Humanoid.MoveDirection.Magnitude > 0 and (tick() - lastTeleportTime) > cooldown then
         SpiritBridgeEnter:InvokeServer(unpack(args))
+
+        local newCFrame = HumanoidRootPart.CFrame * CFrame.new(0, 0, -speed)
+        HumanoidRootPart.CFrame = newCFrame
+        
+        lastTeleportTime = tick() -- Reset the last teleportation time
     end
 end
 
-
-local LocalPlayer = game.Players.LocalPlayer
-local Character = LocalPlayer.Character
-local HumanoidRootPart = Character.HumanoidRootPart
-local CFramePosition = HumanoidRootPart.CFrame
-
-while wait() do
-    local args = {
-        [1] = {
-            ["partPositions"] = {
-                [1] = Vector3.new(CFramePosition),
-                [2] = Vector3.new(CFramePosition),
-                [3] = Vector3.new(CFramePosition),
-                [4] = Vector3.new(CFramePosition),
-                [5] = Vector3.new(CFramePosition),
-                [6] = Vector3.new(CFramePosition),
-                [7] = Vector3.new(CFramePosition)
-            },
-            ["partSize"] = Vector3.new(999999, 0.5, 9999.99999999999999999999)
-        }
-    }
-
-	    
-	    InvokeSpiritBridge(args)
-
-    
-    Character.Humanoid.WalkSpeed = 100
-end
 
     end,
 })
