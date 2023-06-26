@@ -502,7 +502,7 @@ end)
 })
 
 Page.Button({
-    Text = "Disabler.",
+    Text = "Disabler .",
     Callback = function()
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -513,7 +513,7 @@ local Humanoid = Character:WaitForChild("Humanoid")
 local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 local RootPartCFrame = HumanoidRootPart.CFrame
 
-local speed = 4.5 
+local speed = 1.5
 
 local args = {
     {
@@ -530,7 +530,7 @@ local args = {
     }
 }
 
-local cooldown = 0.5 -- Change this to adjust the frequency of teleportation
+local cooldown = 0 -- Change this to adjust the frequency of teleportation
 local lastTeleportTime = 0
 
 while wait() do
