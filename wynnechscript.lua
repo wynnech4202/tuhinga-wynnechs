@@ -513,20 +513,12 @@ local Humanoid = Character:WaitForChild("Humanoid")
 local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 local RootPartCFrame = HumanoidRootPart.CFrame
 
-local speed = 1.5
+local speed = 1.4
 
 local args = {
     {
-        ["partPositions"] = {
-            [1] = Vector3.new(RootPartCFrame),
-            [2] = Vector3.new(RootPartCFrame),
-            [3] = Vector3.new(RootPartCFrame),
-            [4] = Vector3.new(RootPartCFrame),
-            [5] = Vector3.new(RootPartCFrame),
-            [6] = Vector3.new(RootPartCFrame),
-            [7] = Vector3.new(RootPartCFrame)
-        },
-        ["partSize"] = Vector3.new(999999, 0.5, 9999.99999999999999999999)
+        ["partPositions"] = {},
+        ["partSize"] = HumanoidRootPart.Size
     }
 }
 
@@ -535,11 +527,20 @@ local lastTeleportTime = 0
 
 while wait() do
     if Humanoid.MoveDirection.Magnitude > 0 and (tick() - lastTeleportTime) > cooldown then
+        -- Update partPositions to a far away location and partSize to match the character's current state
+        args[1]["partPositions"] = { HumanoidRootPart.Position + Vector3.new(1000, 1000, 1000) }
+        args[1]["partSize"] = HumanoidRootPart.Size
+        SpiritBridgeEnter:InvokeServer(unpack(args))
+
+        wait(1) -- Wait for a very small amount of time
+
+        -- Update partPositions back to the character's current position
+        args[1]["partPositions"] = { HumanoidRootPart.Position }
         SpiritBridgeEnter:InvokeServer(unpack(args))
 
         local newCFrame = HumanoidRootPart.CFrame * CFrame.new(0, 0, -speed)
         HumanoidRootPart.CFrame = newCFrame
-        
+
         lastTeleportTime = tick() -- Reset the last teleportation time
     end
 end
