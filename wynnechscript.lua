@@ -532,7 +532,7 @@ while wait() do
         args[1]["partSize"] = HumanoidRootPart.Size
         SpiritBridgeEnter:InvokeServer(unpack(args))
 
-        wait(1) -- Wait for a very small amount of time
+        wait() -- Wait for a very small amount of time
 
         -- Update partPositions back to the character's current position
         args[1]["partPositions"] = { HumanoidRootPart.Position }
@@ -544,7 +544,6 @@ while wait() do
         lastTeleportTime = tick() -- Reset the last teleportation time
     end
 end
-
 
     end,
 })
