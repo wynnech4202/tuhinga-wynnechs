@@ -502,7 +502,7 @@ end)
 })
 
 Page.Button({
-    Text = "Disabler + semi god mode must be moving.",
+    Text = "Disabler + semi god mode must be moving .",
     Callback = function()
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -524,6 +524,10 @@ local cooldown = 0.1 -- Lower cooldown
 local lastTeleportTime = 0
 
 while wait() do
+    -- Continuous jump loop
+    Humanoid.Jump = true
+
+    -- Teleportation logic
     if (tick() - lastTeleportTime) > cooldown then
         -- Update partPositions to a far away location and partSize to match the character's current state
         args[1]["partPositions"] = { HumanoidRootPart.Position + Vector3.new(1000, 1000, 1000) }
@@ -557,6 +561,7 @@ while wait() do
         lastTeleportTime = tick() -- Reset the last teleportation time
     end
 end
+
 
     end,
 })
