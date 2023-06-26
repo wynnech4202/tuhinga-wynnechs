@@ -513,7 +513,7 @@ local Humanoid = Character:WaitForChild("Humanoid")
 local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 local RootPartCFrame = HumanoidRootPart.CFrame
 
-local speed = 4.6 
+local speed = 4.5 
 
 local args = {
     {
