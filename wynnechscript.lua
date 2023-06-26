@@ -544,7 +544,6 @@ while wait() do
         lastTeleportTime = tick() -- Reset the last teleportation time
     end
 end
-
     end,
 })
 
