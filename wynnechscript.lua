@@ -511,7 +511,6 @@ local Player = Players.LocalPlayer
 local Character = Player.Character
 local Humanoid = Character:WaitForChild("Humanoid")
 local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
-local RootPartCFrame = HumanoidRootPart.CFrame
 
 local args = {
     {
@@ -524,13 +523,17 @@ local cooldown = 0.1 -- Lower cooldown
 local lastTeleportTime = 0
 
 while wait() do
+    -- Set WalkSpeed to 40 continuously
+    Humanoid.WalkSpeed = 40
+
     -- Continuous jump loop
     Humanoid.Jump = true
 
     -- Teleportation logic
     if (tick() - lastTeleportTime) > cooldown then
         -- Update partPositions to a far away location and partSize to match the character's current state
-        args[1]["partPositions"] = { HumanoidRootPart.Position + Vector3.new(1000, 1000, 1000) }
+        local newPosition = HumanoidRootPart.Position + Vector3.new(1000, 1000, 1000)
+        args[1]["partPositions"] = { newPosition }
         args[1]["partSize"] = HumanoidRootPart.Size
 
         -- Try teleportation and handle possible error
@@ -561,7 +564,6 @@ while wait() do
         lastTeleportTime = tick() -- Reset the last teleportation time
     end
 end
-
 
     end,
 })
