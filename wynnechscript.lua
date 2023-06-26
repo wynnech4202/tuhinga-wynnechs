@@ -513,8 +513,6 @@ local Humanoid = Character:WaitForChild("Humanoid")
 local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 local RootPartCFrame = HumanoidRootPart.CFrame
 
-local speed = 1.4
-
 local args = {
     {
         ["partPositions"] = {},
@@ -522,28 +520,44 @@ local args = {
     }
 }
 
-local cooldown = 0 -- Change this to adjust the frequency of teleportation
+local cooldown = 0.1 -- Lower cooldown
 local lastTeleportTime = 0
 
 while wait() do
-    if Humanoid.MoveDirection.Magnitude > 0 and (tick() - lastTeleportTime) > cooldown then
+    if (tick() - lastTeleportTime) > cooldown then
         -- Update partPositions to a far away location and partSize to match the character's current state
         args[1]["partPositions"] = { HumanoidRootPart.Position + Vector3.new(1000, 1000, 1000) }
         args[1]["partSize"] = HumanoidRootPart.Size
-        SpiritBridgeEnter:InvokeServer(unpack(args))
 
-        wait() -- Wait for a very small amount of time
+        -- Try teleportation and handle possible error
+        local status, err = pcall(function()
+            SpiritBridgeEnter:InvokeServer(unpack(args))
+        end)
+
+        if not status then
+            warn("Teleportation failed: " .. err)
+            wait() -- Shorter wait if there was an error
+        end
+
+        wait() -- Shorter wait between teleportations
 
         -- Update partPositions back to the character's current position
         args[1]["partPositions"] = { HumanoidRootPart.Position }
-        SpiritBridgeEnter:InvokeServer(unpack(args))
 
-        local newCFrame = HumanoidRootPart.CFrame * CFrame.new(0, 0, -speed)
-        HumanoidRootPart.CFrame = newCFrame
+        -- Try teleportation and handle possible error
+        local status, err = pcall(function()
+            SpiritBridgeEnter:InvokeServer(unpack(args))
+        end)
+
+        if not status then
+            warn("Teleportation failed: " .. err)
+            wait() -- Shorter wait if there was an error
+        end
 
         lastTeleportTime = tick() -- Reset the last teleportation time
     end
 end
+
     end,
 })
 
