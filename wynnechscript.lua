@@ -2,7 +2,7 @@ local Material = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinl
 local username = game.Players.LocalPlayer.Name
 
 local UI = Material.Load({
-     Title = "wynnech (beta) private   ",
+     Title = "wynnech private   ",
      Style = 5,
      SizeX = 500,
      SizeY = 600,
