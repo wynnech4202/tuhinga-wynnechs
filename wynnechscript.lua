@@ -502,7 +502,7 @@ end)
 })
 
 Page.Button({
-    Text = "Disabler + semi god mode.",
+    Text = "Disabler + semi god mode must be moving.",
     Callback = function()
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
