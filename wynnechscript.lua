@@ -511,7 +511,7 @@ local SpiritBridgeEnter = ReplicatedStorage:WaitForChild("rbxts_include"):WaitFo
 
 local Player = Players.LocalPlayer
 
-local cooldown = 0.1 -- Lower cooldown
+local cooldown = 0.00000001 -- Lower cooldown
 local lastTeleportTime = 0
 
 local function onStartCharacter(character)
