@@ -602,3 +602,28 @@ end)
 
     end,
 })
+
+
+Page.Button({
+    Text = "just ac disabler no god mode",
+    Callback = function()
+       while wait() do
+    local args = {
+        [1] = {
+            ["partPositions"] = {
+                [1] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
+                [2] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
+                [3] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
+                [4] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
+                [5] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
+                [6] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame),
+                [7] = Vector3.new(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame)
+            },
+            ["partSize"] = Vector3.new(99999999, 100, 99999999.99999999999999999999)
+        }
+    }
+
+    game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("SpiritBridgeEnter"):InvokeServer(unpack(args))
+end
+    end,
+})
