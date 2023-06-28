@@ -632,17 +632,17 @@ end
 Page.Button({
     Text = "remote finder (click text box to see remotes)",
     Callback = function()
-       local ScreenGui = Instance.new("ScreenGui")
+local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game.CoreGui
 ScreenGui.Name = "RemoteEventGUI"
 
 local ScrollingFrame = Instance.new("ScrollingFrame")
 ScrollingFrame.Parent = ScreenGui
 ScrollingFrame.Size = UDim2.new(0, 300, 0, 300)
-ScrollingFrame.Position = UDim2.new(0, 10, 1, -310) -- To the bottom left corner of the screen
+ScrollingFrame.Position = UDim2.new(0, 10, 1, -310)
 ScrollingFrame.ScrollBarThickness = 5
 ScrollingFrame.BackgroundColor3 = Color3.new(1, 1, 1)
-ScrollingFrame.CanvasSize = UDim2.new(0, 0, 20, 0) -- We set this to a high value initially.
+ScrollingFrame.CanvasSize = UDim2.new(0, 0, 20, 0)
 
 local UIListLayout = Instance.new("UIListLayout")
 UIListLayout.Parent = ScrollingFrame
@@ -652,24 +652,22 @@ UIListLayout.Padding = UDim.new(0, 5)
 local TextBox = Instance.new("TextBox")
 TextBox.Parent = ScreenGui
 TextBox.Size = UDim2.new(0, 300, 0, 30)
-TextBox.Position = UDim2.new(0, 10, 1, -340) -- Just above the ScrollingFrame
+TextBox.Position = UDim2.new(0, 10, 1, -340)
 TextBox.PlaceholderText = "Search..."
 
--- Create a TextBox for credits
 local CreditBox = Instance.new("TextBox")
 CreditBox.Parent = ScreenGui
 CreditBox.Size = UDim2.new(0, 300, 0, 30)
-CreditBox.Position = UDim2.new(0, 10, 1, -370) -- Positioned above the existing TextBox
-CreditBox.Text = "Credits: wynnech, datboi my friend." -- Assign credit text
-CreditBox.BackgroundColor3 = Color3.new(1, 1, 1) -- You may want to match the color of other elements
-CreditBox.TextColor3 = Color3.new(0, 0, 0) -- Choose a color that provides good contrast with the background
-CreditBox.Font = Enum.Font.SourceSans -- Match the font with other elements
-CreditBox.TextSize = 14 -- Choose an appropriate text size
-CreditBox.ClearTextOnFocus = false -- Prevent the text from being cleared on focus
-CreditBox.TextEditable = false -- Prevent the text from being edited by the player
+CreditBox.Position = UDim2.new(0, 10, 1, -370)
+CreditBox.Text = "Credits: wynnech, datboi my friend."
+CreditBox.BackgroundColor3 = Color3.new(1, 1, 1)
+CreditBox.TextColor3 = Color3.new(0, 0, 0)
+CreditBox.Font = Enum.Font.SourceSans
+CreditBox.TextSize = 14
+CreditBox.ClearTextOnFocus = false
+CreditBox.TextEditable = false
 
-
-local buttons = {} 
+local buttons = {}
 local function updateCanvasSize()
     local totalHeight = 0
     for _, button in pairs(buttons) do
@@ -687,24 +685,25 @@ local function createButton(remote)
     Button.Parent = ScrollingFrame
 
     Button.MouseButton1Click:Connect(function()
-        -- Check if the remote is a RemoteEvent or RemoteFunction and call the appropriate method
         if remote:IsA("RemoteEvent") then
             remote:FireServer()
         elseif remote:IsA("RemoteFunction") then
             remote:InvokeServer()
         end
-        
-        -- Copy the remote's name to the clipboard
+
         setclipboard(remote.Name)
     end)
 
-    -- Hide the button by default
     Button.Visible = false
 
-    -- Show the button if the search bar is empty or the button's text matches the search query
     TextBox:GetPropertyChangedSignal("Text"):Connect(function()
         Button.Visible = TextBox.Text == "" or string.find(string.lower(Button.Text), string.lower(TextBox.Text)) ~= nil
         updateCanvasSize()
+
+        -- Scroll to the top of the ScrollingFrame when searching
+        if TextBox.Text ~= "" then
+            ScrollingFrame.CanvasPosition = Vector2.new(0, 0)
+        end
     end)
 
     table.insert(buttons, Button)
@@ -720,5 +719,6 @@ local function updateGui()
 end
 
 updateGui()
+
     end,
 })
