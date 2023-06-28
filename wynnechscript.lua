@@ -627,3 +627,98 @@ Page.Button({
 end
     end,
 })
+
+
+Page.Button({
+    Text = "remote finder (click text box to see remotes)",
+    Callback = function()
+       local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.CoreGui
+ScreenGui.Name = "RemoteEventGUI"
+
+local ScrollingFrame = Instance.new("ScrollingFrame")
+ScrollingFrame.Parent = ScreenGui
+ScrollingFrame.Size = UDim2.new(0, 300, 0, 300)
+ScrollingFrame.Position = UDim2.new(0, 10, 1, -310) -- To the bottom left corner of the screen
+ScrollingFrame.ScrollBarThickness = 5
+ScrollingFrame.BackgroundColor3 = Color3.new(1, 1, 1)
+ScrollingFrame.CanvasSize = UDim2.new(0, 0, 20, 0) -- We set this to a high value initially.
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Parent = ScrollingFrame
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 5)
+
+local TextBox = Instance.new("TextBox")
+TextBox.Parent = ScreenGui
+TextBox.Size = UDim2.new(0, 300, 0, 30)
+TextBox.Position = UDim2.new(0, 10, 1, -340) -- Just above the ScrollingFrame
+TextBox.PlaceholderText = "Search..."
+
+-- Create a TextBox for credits
+local CreditBox = Instance.new("TextBox")
+CreditBox.Parent = ScreenGui
+CreditBox.Size = UDim2.new(0, 300, 0, 30)
+CreditBox.Position = UDim2.new(0, 10, 1, -370) -- Positioned above the existing TextBox
+CreditBox.Text = "Credits: wynnech, datboi." -- Assign credit text
+CreditBox.BackgroundColor3 = Color3.new(1, 1, 1) -- You may want to match the color of other elements
+CreditBox.TextColor3 = Color3.new(0, 0, 0) -- Choose a color that provides good contrast with the background
+CreditBox.Font = Enum.Font.SourceSans -- Match the font with other elements
+CreditBox.TextSize = 14 -- Choose an appropriate text size
+CreditBox.ClearTextOnFocus = false -- Prevent the text from being cleared on focus
+CreditBox.TextEditable = false -- Prevent the text from being edited by the player
+
+
+local buttons = {} 
+local function updateCanvasSize()
+    local totalHeight = 0
+    for _, button in pairs(buttons) do
+        if button.Visible then
+            totalHeight = totalHeight + button.Size.Y.Offset
+        end
+    end
+    ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, totalHeight + #buttons * UIListLayout.Padding.Offset)
+end
+
+local function createButton(remote)
+    local Button = Instance.new("TextButton")
+    Button.Size = UDim2.new(1, 0, 0, 30)
+    Button.Text = remote.Name
+    Button.Parent = ScrollingFrame
+
+    Button.MouseButton1Click:Connect(function()
+        -- Check if the remote is a RemoteEvent or RemoteFunction and call the appropriate method
+        if remote:IsA("RemoteEvent") then
+            remote:FireServer()
+        elseif remote:IsA("RemoteFunction") then
+            remote:InvokeServer()
+        end
+        
+        -- Copy the remote's name to the clipboard
+        setclipboard(remote.Name)
+    end)
+
+    -- Hide the button by default
+    Button.Visible = false
+
+    -- Show the button if the search bar is empty or the button's text matches the search query
+    TextBox:GetPropertyChangedSignal("Text"):Connect(function()
+        Button.Visible = TextBox.Text == "" or string.find(string.lower(Button.Text), string.lower(TextBox.Text)) ~= nil
+        updateCanvasSize()
+    end)
+
+    table.insert(buttons, Button)
+end
+
+local function updateGui()
+    for _, descendant in pairs(game:GetDescendants()) do
+        if descendant:IsA("RemoteEvent") or descendant:IsA("RemoteFunction") then
+            createButton(descendant)
+        end
+    end
+    updateCanvasSize()
+end
+
+updateGui()
+    end,
+})
