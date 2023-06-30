@@ -667,7 +667,27 @@ CreditBox.TextSize = 14
 CreditBox.ClearTextOnFocus = false
 CreditBox.TextEditable = false
 
+
+local NewRemoteScreenGui = Instance.new("ScreenGui")
+NewRemoteScreenGui.Parent = game.CoreGui
+NewRemoteScreenGui.Name = "NewRemoteScreenGui"
+
+local NewRemoteFrame = Instance.new("ScrollingFrame")
+NewRemoteFrame.Parent = NewRemoteScreenGui
+NewRemoteFrame.Size = UDim2.new(0, 300, 0, 300)
+NewRemoteFrame.Position = UDim2.new(0, 320, 1, -310) 
+NewRemoteFrame.ScrollBarThickness = 5
+NewRemoteFrame.BackgroundColor3 = Color3.new(1, 1, 1)
+NewRemoteFrame.CanvasSize = UDim2.new(0, 0, 20, 0)
+
+local NewUIListLayout = Instance.new("UIListLayout")
+NewUIListLayout.Parent = NewRemoteFrame
+NewUIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+NewUIListLayout.Padding = UDim.new(0, 5)
+
 local buttons = {}
+local newButtons = {}
+
 local function updateCanvasSize()
     local totalHeight = 0
     for _, button in pairs(buttons) do
@@ -686,7 +706,12 @@ local function createButton(remote)
 
     Button.MouseButton1Click:Connect(function()
         if remote:IsA("RemoteEvent") then
-            remote:FireServer()
+           
+            if string.find(remote.Name, "Client") then 
+                print("FireClient isn't supported in this context!")
+            else
+                remote:FireServer()
+            end
         elseif remote:IsA("RemoteFunction") then
             remote:InvokeServer()
         end
@@ -700,13 +725,22 @@ local function createButton(remote)
         Button.Visible = TextBox.Text == "" or string.find(string.lower(Button.Text), string.lower(TextBox.Text)) ~= nil
         updateCanvasSize()
 
-        -- Scroll to the top of the ScrollingFrame when searching
+        
         if TextBox.Text ~= "" then
             ScrollingFrame.CanvasPosition = Vector2.new(0, 0)
         end
     end)
 
     table.insert(buttons, Button)
+end
+
+local function createNewButton(remote)
+    local Button = Instance.new("TextButton")
+    Button.Size = UDim2.new(1, 0, 0, 30)
+    Button.Text = remote.Name
+    Button.Parent = NewRemoteFrame
+
+    table.insert(newButtons, Button)
 end
 
 local function updateGui()
@@ -718,7 +752,118 @@ local function updateGui()
     updateCanvasSize()
 end
 
+local function updateNewGui(remote)
+    if remote:IsA("RemoteEvent") or remote:IsA("RemoteFunction") then
+        createNewButton(remote)
+    end
+end
+
 updateGui()
+
+game:GetService('ReplicatedStorage').ChildAdded:Connect(updateNewGui)
+
+
+local UpdateButton = Instance.new("TextButton")
+UpdateButton.Parent = NewRemoteScreenGui
+UpdateButton.Size = UDim2.new(0, 100, 0, 30)
+UpdateButton.Position = UDim2.new(0, 520, 1, -370)
+UpdateButton.Text = "Update"
+UpdateButton.Font = Enum.Font.SourceSans
+UpdateButton.TextSize = 14
+UpdateButton.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
+UpdateButton.TextColor3 = Color3.new(0, 0, 0)
+
+
+local ShowHideButton = Instance.new("TextButton")
+ShowHideButton.Parent = NewRemoteScreenGui
+ShowHideButton.Size = UDim2.new(0, 100, 0, 30)
+ShowHideButton.Position = UDim2.new(0, 410, 1, -370)
+ShowHideButton.Text = "Show/Hide"
+ShowHideButton.Font = Enum.Font.SourceSans
+ShowHideButton.TextSize = 14
+ShowHideButton.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
+ShowHideButton.TextColor3 = Color3.new(0, 0, 0)
+
+ShowHideButton.MouseButton1Click:Connect(function()
+    NewRemoteFrame.Visible = not NewRemoteFrame.Visible
+    UpdateButton.Visible = not UpdateButton.Visible
+end)
+
+ShowHideButton.MouseButton1Click:Connect(function()
+    if NewRemoteFrame.BackgroundTransparency == 0 then
+        NewRemoteFrame.BackgroundTransparency = 1
+        for _, button in pairs(newButtons) do
+            button.Visible = false
+        end
+        UpdateButton.Visible = true 
+    else
+        NewRemoteFrame.BackgroundTransparency = 0
+        for _, button in pairs(newButtons) do
+            button.Visible = true
+        end
+        UpdateButton.Visible = false 
+    end
+end)
+
+
+local UserInputService = game:GetService("UserInputService")
+
+
+local guiVisible = true
+
+
+local function inputHandler(input)
+    
+    if input.KeyCode == Enum.KeyCode.H then
+        
+        guiVisible = not guiVisible
+
+        
+        ScreenGui.Enabled = guiVisible
+        NewRemoteScreenGui.Enabled = guiVisible
+
+        
+    end
+end
+
+
+local RecentLabel = Instance.new("TextLabel")
+RecentLabel.Parent = NewRemoteScreenGui
+RecentLabel.Size = UDim2.new(0, 100, 0, 30)
+RecentLabel.Position = UDim2.new(0, 410, 1, -415)
+RecentLabel.Text = "Recent Tab"
+RecentLabel.Font = Enum.Font.SourceSans
+RecentLabel.TextSize = 14
+RecentLabel.BackgroundColor3 = Color3.new(1, 1, 1) 
+RecentLabel.TextColor3 = Color3.new(0, 0, 0)
+RecentLabel.Visible = true 
+
+
+local function inputHandler(input)
+    if input.KeyCode == Enum.KeyCode.H then
+        guiVisible = not guiVisible
+
+        ScreenGui.Enabled = guiVisible
+        NewRemoteScreenGui.Enabled = guiVisible
+        RecentLabel.Visible = guiVisible 
+    end
+end
+
+UserInputService.InputBegan:Connect(inputHandler)
+
+local function clearGui(scrollingFrame, buttons)
+    for _, button in pairs(buttons) do
+        button:Destroy()
+    end
+    buttons = {}
+    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+end
+
+UpdateButton.MouseButton1Click:Connect(function()
+    clearGui(NewRemoteFrame, newButtons)
+    updateNewGui()
+end)
+
 
     end,
 })
