@@ -667,7 +667,6 @@ CreditBox.TextSize = 14
 CreditBox.ClearTextOnFocus = false
 CreditBox.TextEditable = false
 
-
 local NewRemoteScreenGui = Instance.new("ScreenGui")
 NewRemoteScreenGui.Parent = game.CoreGui
 NewRemoteScreenGui.Name = "NewRemoteScreenGui"
@@ -725,7 +724,6 @@ local function createButton(remote)
         Button.Visible = TextBox.Text == "" or string.find(string.lower(Button.Text), string.lower(TextBox.Text)) ~= nil
         updateCanvasSize()
 
-        
         if TextBox.Text ~= "" then
             ScrollingFrame.CanvasPosition = Vector2.new(0, 0)
         end
@@ -762,7 +760,6 @@ updateGui()
 
 game:GetService('ReplicatedStorage').ChildAdded:Connect(updateNewGui)
 
-
 local UpdateButton = Instance.new("TextButton")
 UpdateButton.Parent = NewRemoteScreenGui
 UpdateButton.Size = UDim2.new(0, 100, 0, 30)
@@ -772,7 +769,6 @@ UpdateButton.Font = Enum.Font.SourceSans
 UpdateButton.TextSize = 14
 UpdateButton.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
 UpdateButton.TextColor3 = Color3.new(0, 0, 0)
-
 
 local ShowHideButton = Instance.new("TextButton")
 ShowHideButton.Parent = NewRemoteScreenGui
@@ -805,65 +801,19 @@ ShowHideButton.MouseButton1Click:Connect(function()
     end
 end)
 
-
 local UserInputService = game:GetService("UserInputService")
-
 
 local guiVisible = true
 
-
-local function inputHandler(input)
-    
-    if input.KeyCode == Enum.KeyCode.H then
-        
-        guiVisible = not guiVisible
-
-        
-        ScreenGui.Enabled = guiVisible
-        NewRemoteScreenGui.Enabled = guiVisible
-
-        
-    end
-end
-
-
-local RecentLabel = Instance.new("TextLabel")
-RecentLabel.Parent = NewRemoteScreenGui
-RecentLabel.Size = UDim2.new(0, 100, 0, 30)
-RecentLabel.Position = UDim2.new(0, 410, 1, -415)
-RecentLabel.Text = "Recent Tab"
-RecentLabel.Font = Enum.Font.SourceSans
-RecentLabel.TextSize = 14
-RecentLabel.BackgroundColor3 = Color3.new(1, 1, 1) 
-RecentLabel.TextColor3 = Color3.new(0, 0, 0)
-RecentLabel.Visible = true 
-
-
 local function inputHandler(input)
     if input.KeyCode == Enum.KeyCode.H then
         guiVisible = not guiVisible
-
         ScreenGui.Enabled = guiVisible
         NewRemoteScreenGui.Enabled = guiVisible
-        RecentLabel.Visible = guiVisible 
     end
 end
 
 UserInputService.InputBegan:Connect(inputHandler)
-
-local function clearGui(scrollingFrame, buttons)
-    for _, button in pairs(buttons) do
-        button:Destroy()
-    end
-    buttons = {}
-    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-end
-
-UpdateButton.MouseButton1Click:Connect(function()
-    clearGui(NewRemoteFrame, newButtons)
-    updateNewGui()
-end)
-
 
     end,
 })
