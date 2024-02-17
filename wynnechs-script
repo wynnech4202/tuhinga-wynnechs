@@ -94,8 +94,8 @@ end)
 
 local function FireServerToTarget(target)
     local ohInstance1 = target
-    local ohVector32 = Vector3.new(0, 0, 0)
-    local ohVector33 = Vector3.new(0, 0, 0)
+    local ohVector32 = Vector3.new(1, 1, 1)
+    local ohVector33 = Vector3.new(0, 100, 0)
     game:GetService("ReplicatedStorage").Remotes.koReflect:FireServer(ohInstance1, ohVector32, ohVector33)
 end
 
