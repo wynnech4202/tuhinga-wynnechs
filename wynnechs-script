@@ -25,13 +25,6 @@ local placePartEnabled = false
 local livingFolder = Workspace.Living
 local livingChildren = livingFolder:GetChildren()
 
-local selectedTarget = nil 
-local loopCount = 0 
-local placePartEnabled = false 
-
-local livingFolder = Workspace.Living
-local livingChildren = livingFolder:GetChildren()
-
 local PlayerDropdown = Tabs.Main:AddDropdown("Target", {
     Title = "Target",
     Values = {"All", "Others"}, 
@@ -94,8 +87,8 @@ end)
 
 local function FireServerToTarget(target)
     local ohInstance1 = target
-    local ohVector32 = Vector3.new(0, 0, 0)
-    local ohVector33 = Vector3.new(0, 0, 0)
+    local ohVector32 = Vector3.new(1, 1, 1)
+    local ohVector33 = Vector3.new(0, 100, 0)
     game:GetService("ReplicatedStorage").Remotes.koReflect:FireServer(ohInstance1, ohVector32, ohVector33)
 end
 
@@ -124,10 +117,14 @@ end
 local function ExecuteAction()
     local dividedLoopCount = math.floor(loopCount / 2)
     local playersNotified = {}
+    local successNotifications = {}
+    local failureNotifications = {}
 
     for _ = 1, dividedLoopCount do
+        local success = false
         if selectedTarget == "All" then
             FireServerToAll()
+            success = true
             for _, player in ipairs(Players:GetPlayers()) do
                 if not playersNotified[player.Name] then
                     table.insert(playersNotified, player.Name)
@@ -136,39 +133,52 @@ local function ExecuteAction()
             end
         elseif selectedTarget == "Others" then
             local affectedPlayers = FireServerToOthers()
-            for _, playerName in ipairs(affectedPlayers) do
-                if not playersNotified[playerName] then
-                    table.insert(playersNotified, playerName)
-                    playersNotified[playerName] = true
+            if #affectedPlayers > 0 then
+                success = true
+                for _, playerName in ipairs(affectedPlayers) do
+                    if not playersNotified[playerName] then
+                        table.insert(playersNotified, playerName)
+                        playersNotified[playerName] = true
+                    end
                 end
             end
         else
             local target = livingFolder:FindFirstChild(selectedTarget)
             if target then
                 FireServerToTarget(target)
+                success = true
                 if not playersNotified[selectedTarget] then
                     table.insert(playersNotified, selectedTarget)
                     playersNotified[selectedTarget] = true
                 end
             else
-                Fluent:Notify({
-                    Title = "Error",
-                    Content = "Target not found: " .. selectedTarget,
-                    Duration = 5
-                })
+                table.insert(failureNotifications, "Target not found: " .. selectedTarget)
             end
+        end
+
+        if success then
+            table.insert(successNotifications, "Sent remote to: " .. selectedTarget)
         end
     end
 
-    local notificationMessage = "Sent remote to: " .. table.concat(playersNotified, ", ")
-    Fluent:Notify({
-        Title = "Remote Sent",
-        Content = notificationMessage,
-        Duration = 10
-    })
+    -- Notify about success
+    if #successNotifications > 0 then
+        Fluent:Notify({
+            Title = "Remote Sent",
+            Content = table.concat(successNotifications, "\n"),
+            Duration = 10
+        })
+    end
+
+    -- Notify about failures
+    if #failureNotifications > 0 then
+        Fluent:Notify({
+            Title = "Error",
+            Content = table.concat(failureNotifications, "\n"),
+            Duration = 10
+        })
+    end
 end
-
-
 
 local ExecuteButton = Tabs.Main:AddButton({
     Title = "Give KnockBack Percentage",
@@ -235,7 +245,6 @@ teleportPart.Touched:Connect(function(hit)
         end
     end
 end)
-
 
 Window:SelectTab(1)
 
