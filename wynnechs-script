@@ -28,13 +28,13 @@ local livingChildren = livingFolder:GetChildren()
 
 local PlayerDropdown = Tabs.Main:AddDropdown("Target", {
     Title = "Target",
-    Values = {"All", "Others"}, 
+    Values = {"All", "Others", "Closest"}, 
     Multi = false,
     Default = 1,
 })
 
 local function populatePlayerDropdown()
-    local playerNames = {"All", "Others"}
+    local playerNames = {"All", "Others", "Closest"}
     for _, player in ipairs(Players:GetPlayers()) do
         table.insert(playerNames, player.Name)
     end
@@ -145,6 +145,34 @@ local function FireServerToOthers()
     return affectedPlayers
 end
 
+local function FireServerToClosest()
+    local myCharacter = Players.LocalPlayer.Character
+    local myPosition = myCharacter and myCharacter.PrimaryPart.Position
+    if not myPosition then return end
+
+    local closestPlayer = nil
+    local closestDistance = math.huge
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= Players.LocalPlayer then
+            local character = player.Character
+            if character and character.PrimaryPart then
+                local distance = (myPosition - character.PrimaryPart.Position).magnitude
+                if distance < closestDistance then
+                    closestPlayer = player
+                    closestDistance = distance
+                end
+            end
+        end
+    end
+
+    if closestPlayer then
+        FireServerToTarget(closestPlayer.Character)
+        return closestPlayer.Name
+    end
+end
+
+
 local function ExecuteAction()
     local dividedLoopCount = math.floor(loopCount / 2)
     local playersNotified = {}
@@ -165,6 +193,12 @@ local function ExecuteAction()
                     table.insert(playersNotified, playerName)
                     playersNotified[playerName] = true
                 end
+            end
+        elseif selectedTarget == "Closest" then
+            local closestPlayerName = FireServerToClosest()
+            if closestPlayerName and not playersNotified[closestPlayerName] then
+                table.insert(playersNotified, closestPlayerName)
+                playersNotified[closestPlayerName] = true
             end
         else
             local target = livingFolder:FindFirstChild(selectedTarget)
@@ -190,7 +224,11 @@ local function ExecuteAction()
         Content = notificationMessage,
         Duration = 10
     })
-end 
+end
+
+
+
+
 
 
 local BlockedAnimationId = "rbxassetid://16101335047"
