@@ -23,14 +23,6 @@ local loopCount = 0
 local placePartEnabled = false 
 
 local livingFolder = Workspace.Living
-local livingChildren = livingFolder:GetChildren()
-
-local selectedTarget = nil 
-local loopCount = 0 
-local placePartEnabled = false 
-
-local livingFolder = Workspace.Living
-local livingChildren = livingFolder:GetChildren()
 
 local PlayerDropdown = Tabs.Main:AddDropdown("Target", {
     Title = "Target",
@@ -71,20 +63,57 @@ local PlacePartToggle = Tabs.Main:AddToggle("PlacePartToggle", {
     Default = false 
 })
 
+local function setupTeleportPart()
+    local teleportPart = Workspace:FindFirstChild("TeleportPart")
+    if teleportPart then
+        teleportPart.Touched:Connect(function(hit)
+            local character = hit.Parent
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                local teleportLocation = Workspace.Map.Crossroads.Trees.Model.Model.Ball.Position
+                humanoid.RootPart.CFrame = CFrame.new(teleportLocation)
+                local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+                if humanoidRootPart then
+                    local initialVelocity = humanoidRootPart.Velocity
+                    local startTime = tick()
+                    local duration = 0.3
+                    while tick() - startTime < duration do
+                        local t = (tick() - startTime) / duration
+                        humanoidRootPart.Velocity = initialVelocity * (1 - t)
+                        wait()
+                    end
+                    humanoidRootPart.Velocity = Vector3.new(0, 0, 0)
+                    humanoidRootPart.Velocity = Vector3.new(0, 0, 0)
+                    humanoidRootPart.Velocity = Vector3.new(0, 0, 0)
+                end
+            end
+        end)
+    end
+end
+
+-- Call the setup function to connect the Touched event handler initially
+setupTeleportPart()
+
 PlacePartToggle:OnChanged(function(state)
     placePartEnabled = state
     if state then
-        local floorPath = Workspace.Map.Crossroads.Room.Floor
-        local part = Instance.new("Part")
-        part.Size = Vector3.new(5000, 20, 5000)
-        part.Position = floorPath.Position
-        part.Anchored = true
-        part.CanCollide = false
-        part.Transparency = 0.5
-        part.BrickColor = BrickColor.new("Bright blue")
-        part.Parent = Workspace
-        part.Name = "TeleportPart" 
+        -- Create the teleportation part if it doesn't exist
+        local existingPart = Workspace:FindFirstChild("TeleportPart")
+        if not existingPart then
+            local floorPath = Workspace.Map.Crossroads.Room.Floor
+            local part = Instance.new("Part")
+            part.Size = Vector3.new(5000, 20, 5000)
+            part.Position = floorPath.Position
+            part.Anchored = true
+            part.CanCollide = false
+            part.Transparency = 0.5
+            part.BrickColor = BrickColor.new("Bright blue")
+            part.Name = "TeleportPart" 
+            part.Parent = Workspace
+            setupTeleportPart() -- Re-connect the Touched event handler
+        end
     else
+        -- Remove the teleportation part if it exists
         local existingPart = Workspace:FindFirstChild("TeleportPart")
         if existingPart then
             existingPart:Destroy()
@@ -211,31 +240,6 @@ Keybind:SetValue("T", "Toggle")
 
 Players.PlayerAdded:Connect(populatePlayerDropdown)
 Players.PlayerRemoving:Connect(populatePlayerDropdown)
-
-local teleportPart = Workspace:WaitForChild("TeleportPart")
-teleportPart.Touched:Connect(function(hit)
-    local character = hit.Parent
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    if humanoid then
-        local teleportLocation = Workspace.Map.Crossroads.Trees.Model.Model.Ball.Position
-        humanoid.RootPart.CFrame = CFrame.new(teleportLocation)
-        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-        if humanoidRootPart then
-            local initialVelocity = humanoidRootPart.Velocity
-            local startTime = tick()
-            local duration = 0.3
-            while tick() - startTime < duration do
-                local t = (tick() - startTime) / duration
-                humanoidRootPart.Velocity = initialVelocity * (1 - t)
-                wait()
-            end
-            humanoidRootPart.Velocity = Vector3.new(0, 0, 0)
-            humanoidRootPart.Velocity = Vector3.new(0, 0, 0)
-            humanoidRootPart.Velocity = Vector3.new(0, 0, 0)
-        end
-    end
-end)
-
 
 Window:SelectTab(1)
 
