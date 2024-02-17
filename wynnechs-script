@@ -25,6 +25,13 @@ local placePartEnabled = false
 local livingFolder = Workspace.Living
 local livingChildren = livingFolder:GetChildren()
 
+local selectedTarget = nil 
+local loopCount = 0 
+local placePartEnabled = false 
+
+local livingFolder = Workspace.Living
+local livingChildren = livingFolder:GetChildren()
+
 local PlayerDropdown = Tabs.Main:AddDropdown("Target", {
     Title = "Target",
     Values = {"All", "Others"}, 
@@ -117,14 +124,10 @@ end
 local function ExecuteAction()
     local dividedLoopCount = math.floor(loopCount / 2)
     local playersNotified = {}
-    local successNotifications = {}
-    local failureNotifications = {}
 
     for _ = 1, dividedLoopCount do
-        local success = false
         if selectedTarget == "All" then
             FireServerToAll()
-            success = true
             for _, player in ipairs(Players:GetPlayers()) do
                 if not playersNotified[player.Name] then
                     table.insert(playersNotified, player.Name)
@@ -133,52 +136,39 @@ local function ExecuteAction()
             end
         elseif selectedTarget == "Others" then
             local affectedPlayers = FireServerToOthers()
-            if #affectedPlayers > 0 then
-                success = true
-                for _, playerName in ipairs(affectedPlayers) do
-                    if not playersNotified[playerName] then
-                        table.insert(playersNotified, playerName)
-                        playersNotified[playerName] = true
-                    end
+            for _, playerName in ipairs(affectedPlayers) do
+                if not playersNotified[playerName] then
+                    table.insert(playersNotified, playerName)
+                    playersNotified[playerName] = true
                 end
             end
         else
             local target = livingFolder:FindFirstChild(selectedTarget)
             if target then
                 FireServerToTarget(target)
-                success = true
                 if not playersNotified[selectedTarget] then
                     table.insert(playersNotified, selectedTarget)
                     playersNotified[selectedTarget] = true
                 end
             else
-                table.insert(failureNotifications, "Target not found: " .. selectedTarget)
+                Fluent:Notify({
+                    Title = "Error",
+                    Content = "Target not found: " .. selectedTarget,
+                    Duration = 5
+                })
             end
         end
-
-        if success then
-            table.insert(successNotifications, "Sent remote to: " .. selectedTarget)
-        end
     end
 
-    -- Notify about success
-    if #successNotifications > 0 then
-        Fluent:Notify({
-            Title = "Remote Sent",
-            Content = table.concat(successNotifications, "\n"),
-            Duration = 10
-        })
-    end
-
-    -- Notify about failures
-    if #failureNotifications > 0 then
-        Fluent:Notify({
-            Title = "Error",
-            Content = table.concat(failureNotifications, "\n"),
-            Duration = 10
-        })
-    end
+    local notificationMessage = "Sent remote to: " .. table.concat(playersNotified, ", ")
+    Fluent:Notify({
+        Title = "Remote Sent",
+        Content = notificationMessage,
+        Duration = 10
+    })
 end
+
+
 
 local ExecuteButton = Tabs.Main:AddButton({
     Title = "Give KnockBack Percentage",
@@ -245,6 +235,7 @@ teleportPart.Touched:Connect(function(hit)
         end
     end
 end)
+
 
 Window:SelectTab(1)
 
