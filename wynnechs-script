@@ -190,7 +190,34 @@ local function ExecuteAction()
         Content = notificationMessage,
         Duration = 10
     })
+end 
+
+local EmoteSpamToggle = Tabs.Main:AddToggle("EmoteSpamToggle", {
+    Title = "Aura Lagger",
+    Description = "works good on bad pcs",
+    Default = false 
+})
+
+local isEmoteSpamEnabled = false
+
+local function SpamEmoteRemote()
+    while true do
+        if isEmoteSpamEnabled then
+            local ohNumber1 = 4
+            game:GetService("ReplicatedStorage").Remotes.game.playEmote:FireServer(ohNumber1)
+        end
+        wait()
+    end
 end
+
+EmoteSpamToggle:OnChanged(function(state)
+    isEmoteSpamEnabled = state
+end)
+
+task.spawn(SpamEmoteRemote)
+
+
+
 
 local ExecuteButton = Tabs.Main:AddButton({
     Title = "Give KnockBack Percentage",
