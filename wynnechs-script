@@ -192,9 +192,15 @@ local function ExecuteAction()
     })
 end 
 
+
+local BlockedAnimationId = "rbxassetid://16101335047"
+local BlockedSoundId = "rbxassetid://1838278111"
+local ReplacementAnimationId = "" -- Empty AnimationId (do nothing)
+local ReplacementSoundId = "" -- Empty SoundId (do nothing)
+
 local EmoteSpamToggle = Tabs.Main:AddToggle("EmoteSpamToggle", {
-    Title = "Aura Lagger",
-    Description = "works good on bad pcs",
+    Title = "Game Bugger",
+    Description = "messes with the game",
     Default = false 
 })
 
@@ -205,6 +211,15 @@ local function SpamEmoteRemote()
         if isEmoteSpamEnabled then
             local ohNumber1 = 4
             game:GetService("ReplicatedStorage").Remotes.game.playEmote:FireServer(ohNumber1)
+            if ReplacementSoundId ~= "" then
+                local sound = Instance.new("Sound")
+                sound.SoundId = ReplacementSoundId
+                sound.Parent = game.Players.LocalPlayer.Character.HumanoidRootPart
+                sound:Play()
+                sound.Ended:Connect(function()
+                    sound:Destroy()
+                end)
+            end
         end
         wait()
     end
@@ -212,6 +227,19 @@ end
 
 EmoteSpamToggle:OnChanged(function(state)
     isEmoteSpamEnabled = state
+    if state then
+        local humanoid = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.AnimationPlayed:Connect(function(animationTrack)
+                if animationTrack.Animation.AnimationId == BlockedAnimationId then
+                    local replacementAnimation = Instance.new("Animation")
+                    replacementAnimation.AnimationId = ReplacementAnimationId
+                    animationTrack:Stop()
+                    humanoid:LoadAnimation(replacementAnimation):Play()
+                end
+            end)
+        end
+    end
 end)
 
 task.spawn(SpamEmoteRemote)
