@@ -1,4 +1,4 @@
---updated
+-- updated
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
@@ -15,9 +15,8 @@ local Window = Fluent:CreateWindow({
     MinimizeKey = Enum.KeyCode.LeftControl
 })
 
-local Tabs = {
-    Main = Window:AddTab({ Title = "Main", Icon = "" }),
-}
+local KnockbackTab = Window:AddTab({ Title = "Knockback", Icon = "" })
+local MiscTab = Window:AddTab({ Title = "Misc", Icon = "" })
 
 local selectedTarget = nil 
 local loopCount = 0 
@@ -26,7 +25,7 @@ local placePartEnabled = false
 local livingFolder = Workspace.Living
 local livingChildren = livingFolder:GetChildren()
 
-local PlayerDropdown = Tabs.Main:AddDropdown("Target", {
+local PlayerDropdown = KnockbackTab:AddDropdown("Target", {
     Title = "Target",
     Values = {"All", "Others", "Closest"}, 
     Multi = false,
@@ -47,7 +46,7 @@ PlayerDropdown:OnChanged(function(value)
     selectedTarget = value
 end)
 
-local LoopSlider = Tabs.Main:AddSlider("LoopCountSlider", {
+local LoopSlider = KnockbackTab:AddSlider("LoopCountSlider", {
     Title = "KnockBack Percentage Count",
     Description = "Set how many KnockBack Percentage Count (0-300)",
     Default = 0,
@@ -59,7 +58,7 @@ local LoopSlider = Tabs.Main:AddSlider("LoopCountSlider", {
     end
 })
 
-local PlacePartToggle = Tabs.Main:AddToggle("PlacePartToggle", {
+local PlacePartToggle = MiscTab:AddToggle("PlacePartToggle", {
     Title = "Anti Void",
     Description = "Toggle to place a part",
     Default = false 
@@ -98,7 +97,7 @@ PlacePartToggle:OnChanged(function(state)
         if not existingPart then
             local floorPath = Workspace.Map.Crossroads.Room.Floor
             local part = Instance.new("Part")
-            part.Size = Vector3.new(5000, 20, 5000)
+            part.Size = Vector3.new(999999999, 20, 99999999)
             part.Position = floorPath.Position
             part.Anchored = true
             part.CanCollide = false
@@ -226,322 +225,406 @@ local function ExecuteAction()
     })
 end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-local ExecuteButton = Tabs.Main:AddButton({
+local ExecuteButtonKnockback = KnockbackTab:AddButton({
     Title = "Give KnockBack Percentage",
     Description = "KnockBack Percentage to selected target",
     Callback = ExecuteAction
 })
 
-local Keybind = Tabs.Main:AddKeybind("Keybind", {
-    Title = "KeyBind",
-    Mode = "Toggle", 
-    Default = "T", 
-    Callback = function(Value)
-        ExecuteAction()
-    end,
-    ChangedCallback = function(New)
-        print("Keybind changed!", New)
-    end
-})
+local autoDeployEnabled = false
+local autoDeployFunction = nil
 
-Keybind:OnClick(function()
-    print("Keybind clicked:", Keybind:GetState())
-end)
-
-Keybind:OnChanged(function()
-    print("Keybind changed:", Keybind.Value)
-end)
-
-task.spawn(function()
-    while true do
-        wait(1)
-        local state = Keybind:GetState()
-        if state then
-            print("Keybind is being held down")
+local AutoDeployToggle = MiscTab:AddToggle("AutoDeployToggle", {
+    Title = "Auto Deploy",
+    Description = "Toggle to automatically deploy when not in Living folder",
+    Default = false,
+    Callback = function(state)
+        autoDeployEnabled = state
+        if autoDeployEnabled then
+            autoDeployFunction = game:GetService("RunService").Stepped:Connect(function()
+                local isInLivingFolder = false
+                for _, child in ipairs(livingFolder:GetChildren()) do
+                    if child == Players.LocalPlayer.Character then
+                        isInLivingFolder = true
+                        break
+                    end
+                end
+                if not isInLivingFolder then
+                    game:GetService("ReplicatedStorage").Remotes.game.deploy:InvokeServer()
+                end
+            end)
+        else
+            if autoDeployFunction then
+                autoDeployFunction:Disconnect()
+                autoDeployFunction = nil
+            end
         end
-        if Fluent.Unloaded then break end
     end
+})
+
+
+local instantAuraEnabled = false
+local auraRange = 20 -- Default aura range
+
+local InstantAuraToggle = MiscTab:AddToggle("InstantAuraToggle", {
+    Title = "Instant Aura",
+    Description = "Toggle to activate instant aura when players are within a certain range",
+    Default = false,
+    Callback = function(state)
+        instantAuraEnabled = state
+    end
+})
+
+local AuraRangeSlider = MiscTab:AddSlider("AuraRangeSlider", {
+    Title = "Aura Range",
+    Description = "Adjust the range of the aura effect",
+    Default = auraRange,
+    Min = 0,
+    Max = 50,
+    Rounding = 0,
+    Callback = function(value)
+        auraRange = value
+    end
+})
+
+local function randomString(length)
+    length = length or 12
+    local charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    local result = ""
+    for i = 1, length do
+        local rand = math.random(1, #charset)
+        result = result .. charset:sub(rand, rand)
+    end
+    return result
+end
+
+local function getRoot(character)
+    if character and character:IsA("Model") then
+        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+        if humanoidRootPart then
+            return humanoidRootPart
+        end
+    end
+    return nil
+end
+
+local function ApplyAuraEffects(player)
+    local speaker = game.Players.LocalPlayer
+    local success, error = pcall(function()
+        -- First, teleport to the anticipated position of the player
+        local playerCharacter = player.Character
+        if playerCharacter then
+            local playerHumanoidRootPart = getRoot(playerCharacter)
+            if playerHumanoidRootPart then
+                local direction = (playerHumanoidRootPart.Position - speaker.Character.HumanoidRootPart.Position).unit
+                local anticipatedPosition = playerHumanoidRootPart.Position + direction * 5 -- Adjust multiplier as needed
+                speaker.Character:SetPrimaryPartCFrame(CFrame.new(anticipatedPosition))
+            end
+        end
+
+        -- Then, fire the remote
+        local ohBoolean1 = true
+        local ohNumber2 = 1708229751.394413
+        game:GetService("ReplicatedStorage").Remotes.game.action.mouse1:FireServer(ohBoolean1, ohNumber2)
+
+        -- Apply the aura effect
+        local bambam = Instance.new("BodyAngularVelocity")
+        bambam.Name = randomString()
+        bambam.Parent = getRoot(speaker.Character)
+        bambam.AngularVelocity = Vector3.new(0, -99999, 0) -- Change Y component to negative to fling downwards
+        bambam.MaxTorque = Vector3.new(0, math.huge, 0)
+        bambam.P = math.huge
+        local Char = speaker.Character:GetChildren()
+        for i, v in next, Char do
+            if v:IsA("BasePart") then
+                v.CanCollide = false
+                v.Massless = true
+                v.Velocity = Vector3.new(0, 0, 0)
+            end
+        end
+
+        -- Teleport back to the original position after delay
+        wait(0.5) -- Adjust the delay as needed
+        local speakerChar = speaker.Character
+        if not speakerChar or not getRoot(speakerChar) then return end
+        for i, v in pairs(getRoot(speakerChar):GetChildren()) do
+            if v.ClassName == 'BodyAngularVelocity' then
+                v:Destroy()
+            end
+        end
+
+        -- Reset everything back to normal
+        local RootPart = speaker.Character:WaitForChild("HumanoidRootPart")
+        local Character = speaker.Character
+        local Humanoid = speaker.Character:WaitForChild("Humanoid")
+        local OldPos = RootPart.CFrame
+        repeat
+            RootPart.CFrame = OldPos * CFrame.new(0, .5, 0)
+            Character:SetPrimaryPartCFrame(OldPos * CFrame.new(0, .5, 0))
+            Humanoid:ChangeState("GettingUp")
+            for _, x in ipairs(Character:GetChildren()) do
+                if x:IsA("BasePart") then
+                    x.Velocity, x.RotVelocity = Vector3.new(), Vector3.new()
+                end
+            end
+            task.wait()
+        until (RootPart.Position - OldPos.p).Magnitude < 25
+    end)
+
+    if not success then
+        warn("An error occurred while applying aura effects:", error)
+    end
+end
+
+local function ResetAura()
+    local speaker = game.Players.LocalPlayer
+    local speakerChar = speaker.Character
+    if not speakerChar or not getRoot(speakerChar) then return end
+    for i, v in pairs(getRoot(speakerChar):GetChildren()) do
+        if v.ClassName == 'BodyAngularVelocity' then
+            v:Destroy()
+        end
+    end
+end
+
+local function CheckAura()
+    if instantAuraEnabled then
+        local speaker = game.Players.LocalPlayer
+        local speakerCharacter = speaker.Character
+        if speakerCharacter then
+            local speakerHumanoidRootPart = getRoot(speakerCharacter)
+            for _, player in ipairs(game.Players:GetPlayers()) do
+                if player ~= game.Players.LocalPlayer and player.Character then
+                    local playerHumanoidRootPart = getRoot(player.Character)
+                    if playerHumanoidRootPart then
+                        local distance = (speakerHumanoidRootPart.Position - playerHumanoidRootPart.Position).magnitude
+                        if distance < auraRange then
+                            ApplyAuraEffects(player)
+                            ResetAura() -- Reset aura after the target goes flying
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+game:GetService("RunService").Stepped:Connect(function()
+    CheckAura()
 end)
 
-Keybind:SetValue("T", "Toggle") 
-
-Players.PlayerAdded:Connect(populatePlayerDropdown)
-Players.PlayerRemoving:Connect(populatePlayerDropdown)
-
-Window:SelectTab(1)
-
-Fluent:Notify({
-    Title = "WP (Wynnech Private)",
-    Content = "The script has been loaded.",
-    Duration = 8
-})
 
 
 
 
 
 
---updated
-local Players = game:GetService("Players")
-local Workspace = game:GetService("Workspace")
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
-local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
-local Window = Fluent:CreateWindow({
-    Title = "WP " .. Fluent.Version,
-    SubTitle = "by Wynnech",
-    TabWidth = 160,
-    Size = UDim2.fromOffset(580, 460),
-    Acrylic = true,
-    Theme = "Dark",
-    MinimizeKey = Enum.KeyCode.LeftControl
-})
 
-local Tabs = {
-    Main = Window:AddTab({ Title = "Main", Icon = "" }),
-}
 
-local selectedTarget = nil 
-local loopCount = 0 
-local placePartEnabled = false 
 
-local livingFolder = Workspace.Living
-local livingChildren = livingFolder:GetChildren()
 
-local PlayerDropdown = Tabs.Main:AddDropdown("Target", {
-    Title = "Target",
-    Values = {"All", "Others", "Closest"}, 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+local function PopulateCapsuleConfigDropdown()
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local capsuleConfigFolder = ReplicatedStorage:FindFirstChild("capsuleConfig")
+    if capsuleConfigFolder then
+        local configNames = {}
+        for _, item in ipairs(capsuleConfigFolder:GetChildren()) do
+            if item:IsA("ModuleScript") then 
+                table.insert(configNames, item.Name)
+            end
+        end
+        return configNames
+    else
+        Fluent:Notify({
+            Title = "Error",
+            Content = "capsuleConfig folder not found in ReplicatedStorage.",
+            Duration = 5
+        })
+        return {}
+    end
+end
+
+local configNames = PopulateCapsuleConfigDropdown()
+local selectedModuleName = ""
+local function EquipSelectedModule()
+    if selectedModuleName ~= "" then
+        game:GetService("ReplicatedStorage").Remotes.inventory.equip:FireServer(selectedModuleName)
+    else
+        Fluent:Notify({
+            Title = "Error",
+            Content = "No ModuleScript selected.",
+            Duration = 5
+        })
+    end
+end
+
+local CapsuleConfigDropdown = MiscTab:AddDropdown("CapsuleConfigDropdown", {
+    Title = "Kit/Skin",
+    Values = configNames, 
     Multi = false,
     Default = 1,
 })
 
-local function populatePlayerDropdown()
-    local playerNames = {"All", "Others", "Closest"}
-    for _, player in ipairs(Players:GetPlayers()) do
-        table.insert(playerNames, player.Name)
-    end
-    PlayerDropdown:SetValues(playerNames)
-end
-
-populatePlayerDropdown()
-
-PlayerDropdown:OnChanged(function(value)
-    selectedTarget = value
+CapsuleConfigDropdown:OnChanged(function(selectedName)
+    selectedModuleName = selectedName 
 end)
 
-local LoopSlider = Tabs.Main:AddSlider("LoopCountSlider", {
-    Title = "KnockBack Percentage Count",
-    Description = "Set how many KnockBack Percentage Count (0-300)",
-    Default = 0,
-    Min = 0,
-    Max = 300,
-    Rounding = 0,
-    Callback = function(Value)
-        loopCount = math.floor(Value)
+
+local EquipKeybind = MiscTab:AddKeybind("EquipKeybind", {
+    Title = "Equip Keybind",
+    Mode = "Toggle", 
+    Default = "E", 
+    Callback = function(state)
+        if state then
+            EquipSelectedModule() 
+        end
     end
 })
 
-local PlacePartToggle = Tabs.Main:AddToggle("PlacePartToggle", {
-    Title = "Anti Void",
-    Description = "Toggle to place a part",
-    Default = false 
-})
 
-local function handleTeleportation()
-    local teleportPart = Workspace:WaitForChild("TeleportPart")
-    teleportPart.Touched:Connect(function(hit)
-        local character = hit.Parent
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
-        if humanoid then
-            local teleportLocation = Workspace.Map.Crossroads.Trees.Model.Model.Ball.Position
-            humanoid.RootPart.CFrame = CFrame.new(teleportLocation)
-            local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-            if humanoidRootPart then
-                local initialVelocity = humanoidRootPart.Velocity
-                local startTime = tick()
-                local duration = 0.3
-                while tick() - startTime < duration do
-                    local t = (tick() - startTime) / duration
-                    humanoidRootPart.Velocity = initialVelocity * (1 - t)
-                    wait()
-                end
-                humanoidRootPart.Velocity = Vector3.new(0, 0, 0)
-                humanoidRootPart.Velocity = Vector3.new(0, 0, 0)
-                humanoidRootPart.Velocity = Vector3.new(0, 0, 0)
-            end
-        end
-    end)
-end
-
-PlacePartToggle:OnChanged(function(state)
-    placePartEnabled = state
-    if state then
-        local existingPart = Workspace:FindFirstChild("TeleportPart")
-        if not existingPart then
-            local floorPath = Workspace.Map.Crossroads.Room.Floor
-            local part = Instance.new("Part")
-            part.Size = Vector3.new(5000, 20, 5000)
-            part.Position = floorPath.Position
-            part.Anchored = true
-            part.CanCollide = false
-            part.Transparency = 0.5
-            part.BrickColor = BrickColor.new("Bright blue")
-            part.Name = "TeleportPart" 
-            part.Parent = Workspace
-            handleTeleportation() 
-        end
-    else
-        local existingPart = Workspace:FindFirstChild("TeleportPart")
-        if existingPart then
-            existingPart:Destroy()
+local function GetAllPlayerNames()
+    local playerNames = {"All"}  
+    for _, player in ipairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer then
+            table.insert(playerNames, player.DisplayName.." ("..player.Name..")")
         end
     end
-end)
-
-local function FireServerToTarget(target)
-    local ohInstance1 = target
-    local ohVector32 = Vector3.new(1, 1, 1)
-    local ohVector33 = Vector3.new(0, 100, 0)
-    game:GetService("ReplicatedStorage").Remotes.koReflect:FireServer(ohInstance1, ohVector32, ohVector33)
+    return playerNames
 end
 
-local function FireServerToAll()
-    local updatedLivingChildren = livingFolder:GetChildren() 
-    for _, child in ipairs(updatedLivingChildren) do
-        FireServerToTarget(child)
-    end
+local function LeaveParty()
+    game:GetService("ReplicatedStorage").Remotes.party.leave:FireServer()
 end
 
-local function FireServerToOthers()
-    local myPlayer = Players.LocalPlayer
-    local updatedLivingChildren = livingFolder:GetChildren()
-    local affectedPlayers = {}
-
-    for _, child in ipairs(updatedLivingChildren) do
-        if child ~= myPlayer.Character then
-            FireServerToTarget(child)
-            table.insert(affectedPlayers, child.Name)
-        end
-    end
-
-    return affectedPlayers
+local function InviteToParty(userId)
+    game:GetService("ReplicatedStorage").Remotes.party.invite:FireServer(userId)
+    game:GetService("ReplicatedStorage").Remotes.party.invite:FireServer(userId)
+    game:GetService("ReplicatedStorage").Remotes.party.invite:FireServer(userId)
+    game:GetService("ReplicatedStorage").Remotes.party.invite:FireServer(userId)
+    game:GetService("ReplicatedStorage").Remotes.party.invite:FireServer(userId)
+    game:GetService("ReplicatedStorage").Remotes.party.invite:FireServer(userId)
+    game:GetService("ReplicatedStorage").Remotes.party.invite:FireServer(userId)
+    game:GetService("ReplicatedStorage").Remotes.party.invite:FireServer(userId)
+    game:GetService("ReplicatedStorage").Remotes.party.invite:FireServer(userId)
+    game:GetService("ReplicatedStorage").Remotes.party.invite:FireServer(userId)
 end
 
-local function FireServerToClosest()
-    local myCharacter = Players.LocalPlayer.Character
-    local myPosition = myCharacter and myCharacter.PrimaryPart.Position
-    if not myPosition then return end
+local annoyToggleState = false
+local selectedPlayer = nil
 
-    local closestPlayer = nil
-    local closestDistance = math.huge
-
-    for _, player in ipairs(Players:GetPlayers()) do
-        if player ~= Players.LocalPlayer then
-            local character = player.Character
-            if character and character.PrimaryPart then
-                local distance = (myPosition - character.PrimaryPart.Position).magnitude
-                if distance < closestDistance then
-                    closestPlayer = player
-                    closestDistance = distance
-                end
-            end
-        end
-    end
-
-    if closestPlayer then
-        FireServerToTarget(closestPlayer.Character)
-        return closestPlayer.Name
-    end
-end
-
-
-local function ExecuteAction()
-    local dividedLoopCount = math.floor(loopCount / 2)
-    local playersNotified = {}
-
-    for _ = 1, dividedLoopCount do
-        if selectedTarget == "All" then
-            FireServerToAll()
-            for _, player in ipairs(Players:GetPlayers()) do
-                if not playersNotified[player.Name] then
-                    table.insert(playersNotified, player.Name)
-                    playersNotified[player.Name] = true
-                end
-            end
-        elseif selectedTarget == "Others" then
-            local affectedPlayers = FireServerToOthers()
-            for _, playerName in ipairs(affectedPlayers) do
-                if not playersNotified[playerName] then
-                    table.insert(playersNotified, playerName)
-                    playersNotified[playerName] = true
-                end
-            end
-        elseif selectedTarget == "Closest" then
-            local closestPlayerName = FireServerToClosest()
-            if closestPlayerName and not playersNotified[closestPlayerName] then
-                table.insert(playersNotified, closestPlayerName)
-                playersNotified[closestPlayerName] = true
-            end
-        else
-            local target = livingFolder:FindFirstChild(selectedTarget)
-            if target then
-                FireServerToTarget(target)
-                if not playersNotified[selectedTarget] then
-                    table.insert(playersNotified, selectedTarget)
-                    playersNotified[selectedTarget] = true
+local function ToggleAnnoyer(state)
+    annoyToggleState = state
+    while annoyToggleState do
+        LeaveParty() 
+        if selectedPlayer then
+            if selectedPlayer == "All" then
+                for _, player in ipairs(game.Players:GetPlayers()) do
+                    if player ~= game.Players.LocalPlayer then
+                        InviteToParty(player.UserId)
+                    end
                 end
             else
-                Fluent:Notify({
-                    Title = "Error",
-                    Content = "Target not found: " .. selectedTarget,
-                    Duration = 5
-                })
+                InviteToParty(selectedPlayer.UserId)
+                if selectedPlayer == game.Players.LocalPlayer then
+                    wait()  
+                end
             end
         end
+        if not annoyToggleState then
+            break 
+        end
+        wait()  
     end
-
-    local notificationMessage = "Sent remote to: " .. table.concat(playersNotified, ", ")
-    Fluent:Notify({
-        Title = "Remote Sent",
-        Content = notificationMessage,
-        Duration = 10
-    })
 end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-local ExecuteButton = Tabs.Main:AddButton({
-    Title = "Give KnockBack Percentage",
-    Description = "KnockBack Percentage to selected target",
-    Callback = ExecuteAction
+local AnnoyerToggle = MiscTab:AddToggle("AnnoyerToggle", {
+    Title = "Annoyer/lagger",
+    Description = "Secret🤫 (works really well lagging on mobile/bad pc players)",
+    Default = false,
+    Callback = ToggleAnnoyer
 })
 
-local Keybind = Tabs.Main:AddKeybind("Keybind", {
+local targetPlayers = GetAllPlayerNames()  
+
+local TargetDropdown = MiscTab:AddDropdown("TargetDropdown", {
+    Title = "Target Players",
+    Values = targetPlayers,
+    Default = "All"
+})
+
+local function UpdatePlayerList()
+    local playerNames = GetAllPlayerNames()
+    TargetDropdown:SetValues(playerNames)
+end
+
+game.Players.PlayerAdded:Connect(UpdatePlayerList)
+game.Players.PlayerRemoving:Connect(UpdatePlayerList)
+
+TargetDropdown:OnChanged(function(value)
+    selectedPlayer = value
+end)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+local Keybind = KnockbackTab:AddKeybind("Keybind", {
     Title = "KeyBind",
     Mode = "Toggle", 
     Default = "T", 
@@ -584,3 +667,8 @@ Fluent:Notify({
     Content = "The script has been loaded.",
     Duration = 8
 })
+
+
+
+
+
