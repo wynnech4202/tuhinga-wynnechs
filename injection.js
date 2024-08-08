@@ -669,7 +669,7 @@ function modifyCode(text) {
 			});
 			
 			// Add Killaura options
-			killauraRange = killaura.addOption("Range", Number, 9);
+			killauraRange = killaura.addOption("Range", Number, 30);
 			killauraAngle = killaura.addOption("Angle", Number, 360);
 			killauraAutoBlock = killaura.addOption("AutoBlock", Boolean, true);
 			killauraWallCheck = killaura.addOption("Wallcheck", Boolean, false);
