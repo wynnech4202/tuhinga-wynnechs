@@ -292,7 +292,7 @@ function modifyCode(text) {
 		{
 			const $ = skins[_];
 			return new Promise((et, tt) => {
-				textureManager.loader.load("https://raw.githubusercontent.com/wynnech4202/tuhinga-wynnechs/main/assets/cape.png", rt => {
+				textureManager.loader.load("https://raw.githubusercontent.com/wynnech4202/tuhinga-wynnechs/main/assets/skin.png", rt => {
 					const nt = {
 						atlas: rt,
 						id: _,
