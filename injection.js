@@ -71,8 +71,8 @@ function modifyCode(text) {
 	addReplacement('this.gltfManager.loadModels()', ',this.loadVape()');
 	addReplacement('ShaderManager.addShaderToMaterialWorld(this.materialTransparentWorld)}', `
 		async loadVape() {
-			this.vapeTexture = await this.loader.loadAsync("https://raw.githubusercontent.com/7GrandDadPGN/VapeForMiniblox/main/assets/logo.png");
-			this.v4Texture = await this.loader.loadAsync("https://raw.githubusercontent.com/7GrandDadPGN/VapeForMiniblox/main/assets/logov4.png");
+			this.vapeTexture = await this.loader.loadAsync("https://raw.githubusercontent.com/wynnech4202/tuhinga-wynnechs/main/assets/logo.png");
+			this.v4Texture = await this.loader.loadAsync("https://raw.githubusercontent.com/wynnech4202/tuhinga-wynnechs/main/assets/logov4.png");
 		}
 	`);
 
@@ -292,7 +292,7 @@ function modifyCode(text) {
 		{
 			const $ = skins[_];
 			return new Promise((et, tt) => {
-				textureManager.loader.load("https://raw.githubusercontent.com/7GrandDadPGN/VapeForMiniblox/main/assets/skin.png", rt => {
+				textureManager.loader.load("https://raw.githubusercontent.com/wynnech4202/tuhinga-wynnechs/main/assets/cape.png", rt => {
 					const nt = {
 						atlas: rt,
 						id: _,
@@ -311,7 +311,7 @@ function modifyCode(text) {
 		{
 			const $ = capes[_];
 			return new Promise((et, tt) => {
-				textureManager.loader.load("https://raw.githubusercontent.com/7GrandDadPGN/VapeForMiniblox/main/assets/cape.png", rt => {
+				textureManager.loader.load("https://raw.githubusercontent.com/wynnech4202/tuhinga-wynnechs/main/assets/cape.png", rt => {
 					const nt = {
 						atlas: rt,
 						id: _,
