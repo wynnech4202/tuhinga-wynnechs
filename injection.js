@@ -2,31 +2,7 @@ let replacements = {};
 
 function addReplacement(replacement, code, replaceit) {
 	replacements[replacement] = [code, replaceit];
-}
 
-function modifyCode(text) {
-	for(const [replacement, code] of Object.entries(replacements)){
-		text = text.replaceAll(replacement, code[1] ? code[0] : replacement + code[0]);
-	}
-	var newScript = document.createElement("script");
-	newScript.type = "module";
-	newScript.crossOrigin = "";
-	newScript.textContent = text;
-	var head = document.querySelector("head");
-	head.appendChild(newScript);
-}
-
-(function() {
-	'use strict';
-
-	// PRE
-	addReplacement('document.addEventListener("DOMContentLoaded",startGame,!1);', `
-		setTimeout(function() {
-			var DOMContentLoaded_event = document.createEvent("Event");
-			DOMContentLoaded_event.initEvent("DOMContentLoaded", true, true);
-			document.dispatchEvent(DOMContentLoaded_event);
-		}, 0);
-	`);
 
 	addReplacement('PotionHelper.potionAmplifiers.set(Potions.jump.getId(),"5");', `
 		let blocking = false;
