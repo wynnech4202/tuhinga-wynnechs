@@ -657,7 +657,7 @@ function modifyCode(text) {
 					unblock();
 				}
 			});
-			killaurarange = killaura.addoption("Range", Number, 9);
+			killaurarange = killaura.addoption("Range", Number, 30);
 			killauraangle = killaura.addoption("Angle", Number, 360);
 			killaurablock = killaura.addoption("AutoBlock", Boolean, true);
 			killaurawall = killaura.addoption("Wallcheck", Boolean, false);
