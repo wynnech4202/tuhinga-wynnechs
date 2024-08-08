@@ -501,7 +501,7 @@ function modifyCode(text) {
 				} else tickLoop["WTap"] = undefined;
 			})
 
-     			// Killaura
+			// Killaura
 			let attackDelay = Date.now();
 			let didSwing = false;
 			let attacked = 0;
@@ -653,7 +653,6 @@ function modifyCode(text) {
 			killaurablock = killaura.addoption("AutoBlock", Boolean, true);
 			killaurawall = killaura.addoption("Wallcheck", Boolean, false);
 			killaurabox = killaura.addoption("Box", Boolean, true);
-
 
 			new Module("FastBreak", function() {});
 
