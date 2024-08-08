@@ -9,6 +9,6 @@
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        unsafeWindow
-// @require      https://raw.githubusercontent.com/7GrandDadPGN/VapeForMiniblox/main/injection.js
+// @require      https://raw.githubusercontent.com/wynnech4202/tuhinga-wynnechs/main/injection.js
 // @run-at       document-start
 // ==/UserScript==
