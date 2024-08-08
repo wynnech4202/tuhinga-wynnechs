@@ -501,71 +501,68 @@ function modifyCode(text) {
 				} else tickLoop["WTap"] = undefined;
 			})
 
-			// Killaura Configuration
+     			// Killaura
 			let attackDelay = Date.now();
 			let didSwing = false;
-			let attackedCount = 0;
+			let attacked = 0;
 			let attackedPlayers = {};
 			let attackList = [];
 			let boxMeshes = [];
-			let killauraRange, killauraAutoBlock, killauraBox, killauraAngle, killauraWallCheck;
+			let killaurarange, killaurablock, killaurabox, killauraangle, killaurawall;
 
-			// Attack function for Killaura
-			function killauraAttack(entity, isFirstAttack) {
-				if (attackDelay < Date.now()) {
+			function killauraAttack(entity, first)
+			{
+				if(attackDelay < Date.now())
+				{
 					const aimPos = player$1.pos.clone().sub(entity.pos);
 					const newYaw = wrapAngleTo180_radians(Math.atan2(aimPos.x, aimPos.z) - player$1.lastReportedYaw);
 					const checkYaw = wrapAngleTo180_radians(Math.atan2(aimPos.x, aimPos.z) - player$1.yaw);
+					if(first) sendYaw = Math.abs(checkYaw) > degToRad(30) && Math.abs(checkYaw) < degToRad(killauraangle[1]) ? player$1.lastReportedYaw + newYaw : false;
 
-					if (isFirstAttack) {
-						sendYaw = Math.abs(checkYaw) > degToRad(30) && Math.abs(checkYaw) < degToRad(killauraAngle[1]) ? player$1.lastReportedYaw + newYaw : false;
-					}
 
-					if (Math.abs(newYaw) < degToRad(30)) {
-						if ((attackedPlayers[entity.id] || 0) < Date.now()) {
-							attackedPlayers[entity.id] = Date.now() + 100;
-						}
-
-						if (!didSwing) {
+					if(Math.abs(newYaw) < degToRad(30))
+					{
+						if((attackedPlayers[entity.id] || 0) < Date.now()) attackedPlayers[entity.id] = Date.now() + 100;
+						if(!didSwing)
+						{
 							hud3D.swingArm();
 							ClientSocket.sendPacket(new SPacketClick({}));
 							didSwing = true;
 						}
-
-						attackedCount++;
+						attacked++;
 						playerControllerMP.syncCurrentPlayItem();
 						ClientSocket.sendPacket(new SPacketUseEntity({
 							id: entity.id,
 							action: 1,
-							hitVec: new PBVector3({ x: 0, y: 0, z: 0 })
+							hitVec: new PBVector3({
+								x: 0,
+								y: 0,
+								z: 0
+							})
 						}));
 						player$1.attackTargetEntityWithCurrentItem(entity);
 					}
 				}
 			}
 
-			// Block function for Killaura
 			function block() {
-				if (attackDelay < Date.now()) {
-					attackDelay = Date.now() + (Math.round(attackedCount / 2) * 100);
-				}
-
-				const currentItem = player$1.inventory.getCurrentItem();
-				if (currentItem && currentItem.getItem() instanceof ItemSword && killauraAutoBlock[1]) {
-					if (!blocking) {
+				if(attackDelay < Date.now()) attackDelay = Date.now() + (Math.round(attacked / 2) * 100);
+				const item = player$1.inventory.getCurrentItem();
+				if(item != null && item.getItem() instanceof ItemSword && killaurablock[1])
+				{
+					if(!blocking)
+					{
 						playerControllerMP.syncCurrentPlayItem();
 						ClientSocket.sendPacket(new SPacketUseItem);
 						blocking = true;
 					}
-				} else {
-					blocking = false;
-				}
+				} else blocking = false;
 			}
 
-			// Unblock function for Killaura
 			function unblock() {
-				const currentItem = player$1.inventory.getCurrentItem();
-				if (blocking && currentItem && currentItem.getItem() instanceof ItemSword) {
+				const item = player$1.inventory.getCurrentItem();
+				if(blocking && item != null && item.getItem() instanceof ItemSword)
+				{
 					playerControllerMP.syncCurrentPlayItem();
 					ClientSocket.sendPacket(new SPacketPlayerAction({
 						position: BlockPos.ORIGIN.toProto(),
@@ -576,18 +573,16 @@ function modifyCode(text) {
 				blocking = false;
 			}
 
-			// Get Team function
 			function getTeam(entity) {
 				const entry = game$1.playerList.playerDataMap.get(entity.id);
-				if (!entry) return;
-				return entry.color !== "white" ? entry.color : undefined;
+				if(!entry) return;
+				return entry.color != "white" ? entry.color : undefined;
 			}
 
-			// Initialize Killaura module
 			const killaura = new Module("Killaura", function(callback) {
-				if (callback) {
-					// Initialize box meshes
-					for (let i = 0; i < 10; i++) {
+				if(callback) {
+					for(let i = 0; i < 10; i++)
+					{
 						const mesh = new Mesh(new BoxGeometry(1, 2, 1));
 						mesh.material.depthTest = false;
 						mesh.material.transparent = true;
@@ -597,64 +592,67 @@ function modifyCode(text) {
 						game$1.gameScene.ambientMeshes.add(mesh);
 						boxMeshes.push(mesh);
 					}
-
 					tickLoop["Killaura"] = function() {
-						attackedCount = 0;
+						attacked = 0;
 						didSwing = false;
 						const localPos = controls.eyePos.clone();
 						const localTeam = getTeam(player$1);
 						const entities = game$1.world.entities;
 
-						attackList = entities.values()
-							.filter(entity => entity.id !== player$1.id)
-							.filter(entity => localPos.distanceTo(entity.pos) < killauraRange[1])
-							.filter(entity => entity instanceof EntityPlayer)
-							.filter(entity => !entity.mode.isSpectator() && !entity.mode.isCreative())
-							.filter(entity => !localTeam || localTeam !== getTeam(entity))
-							.filter(entity => !killauraWallCheck[1] || player$1.canEntityBeSeen(entity));
-
-						attackList.sort((a, b) => (attackedPlayers[a.id] || 0) - (attackedPlayers[b.id] || 0));
-
-						for (const entity of attackList) {
-							killauraAttack(entity, attackList[0] === entity);
+						attackList = [];
+						for (const entity of entities.values()) {
+							if (entity.id == player$1.id) continue;
+							const newDist = localPos.distanceTo(entity.pos);
+							if(newDist < killaurarange[1] && entity instanceof EntityPlayer) {
+								if(entity.mode.isSpectator() || entity.mode.isCreative()) continue;
+								if(localTeam && localTeam == getTeam(entity)) continue;
+								if(killaurawall[1] && !player$1.canEntityBeSeen(entity)) continue;
+								attackList.push(entity);
+							}
 						}
 
-						if (attackList.length > 0) {
-							block();
-						} else {
+						attackList.sort((a, b) => {
+							return (attackedPlayers[a.id] || 0) > (attackedPlayers[b.id] || 0) ? 1 : -1;
+						});
+
+						for(const entity of attackList) killauraAttack(entity, attackList[0] == entity);
+
+						if(attackList.length > 0) block();
+						else {
 							unblock();
 							sendYaw = false;
 						}
 					};
 
 					renderTickLoop["Killaura"] = function() {
-						boxMeshes.forEach((box, index) => {
-							const entity = attackList[index];
-							box.visible = !!entity && killauraBox[1];
-							if (box.visible) {
+						for(let i = 0; i < boxMeshes.length; i++)
+						{
+							const entity = attackList[i];
+							const box = boxMeshes[i];
+							box.visible = entity != undefined && killaurabox[1];
+							if(box.visible)
+							{
 								const pos = entity.mesh.position;
 								box.position.copy(new Vector3$1(pos.x, pos.y + 1, pos.z));
 							}
-						});
+						}
 					};
-				} else {
-					// Cleanup on module deactivation
+				}
+				else
+				{
 					tickLoop["Killaura"] = undefined;
 					renderTickLoop["Killaura"] = undefined;
-					boxMeshes.forEach(box => box.visible = false);
-					boxMeshes.length = 0;
+					for(const box of boxMeshes) box.visible = false;
+					boxMeshes.splice(boxMeshes.length);
 					sendYaw = false;
 					unblock();
 				}
 			});
-
-			// Add Killaura options
-			killauraRange = killaura.addOption("Range", Number, 9);
-			killauraAngle = killaura.addOption("Angle", Number, 360);
-			killauraAutoBlock = killaura.addOption("AutoBlock", Boolean, true);
-			killauraWallCheck = killaura.addOption("Wallcheck", Boolean, false);
-			killauraBox = killaura.addOption("Box", Boolean, true);
-
+			killaurarange = killaura.addoption("Range", Number, 9);
+			killauraangle = killaura.addoption("Angle", Number, 360);
+			killaurablock = killaura.addoption("AutoBlock", Boolean, true);
+			killaurawall = killaura.addoption("Wallcheck", Boolean, false);
+			killaurabox = killaura.addoption("Box", Boolean, true);
 
 
 			new Module("FastBreak", function() {});
